@@ -589,21 +589,22 @@ async function fetchKNMI() {
   }
 
   try {
-    // Probeer meest recente bestand, stap terug als nodig
-    let dlUrl = null;
-    for (const terugval of [20, 30, 40, 50]) {
-      const filename = recentFilename(terugval);
-      setStatus(`Ophalen: ${filename}…`);
+    // Haal het meest recente bestand op via de lijst-API
+    setStatus("Meest recente meting opzoeken bij KNMI…");
+    const listUrl = `${WORKER_URL}/knmi/open-data/v1/datasets/${KNMI_DATASET}/versions/${KNMI_VERSION}/files?maxKeys=1&orderBy=lastModified&sorting=desc`;
+    const listResp = await fetch(listUrl);
+    if (!listResp.ok) throw new Error(`Lijst ophalen mislukt: ${listResp.status}`);
+    const listData = await listResp.json();
+    if (!listData.files || listData.files.length === 0) throw new Error("Geen bestanden gevonden bij het KNMI.");
 
-      const metaUrl = `${WORKER_URL}/knmi/open-data/v1/datasets/${KNMI_DATASET}/versions/${KNMI_VERSION}/files/${filename}/url`;
-      const metaResp = await fetch(metaUrl);
+    const filename = listData.files[0].filename;
+    setStatus(`Ophalen: ${filename}…`);
 
-      if (metaResp.ok) {
-        const meta = await metaResp.json();
-        dlUrl = meta.temporaryDownloadUrl;
-        break;
-      }
-    }
+    const metaUrl = `${WORKER_URL}/knmi/open-data/v1/datasets/${KNMI_DATASET}/versions/${KNMI_VERSION}/files/${filename}/url`;
+    const metaResp = await fetch(metaUrl);
+    if (!metaResp.ok) throw new Error(`Download-URL ophalen mislukt: ${metaResp.status}`);
+    const meta = await metaResp.json();
+    const dlUrl = meta.temporaryDownloadUrl;
 
     if (!dlUrl) throw new Error("Geen actueel bestand gevonden bij het KNMI.");
 
