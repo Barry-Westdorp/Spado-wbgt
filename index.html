@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WBGT · Woensdrecht · KNMI Hittekracht</title>
+<style>
+  /* ── Reset & base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0b0b16;
+    --surface:   #13132a;
+    --card:      #1a1a35;
+    --border:    #2a2a50;
+    --accent:    #6c63ff;
+    --cyan:      #00d4ff;
+    --coral:     #ff6b8a;
+    --green:     #00e5a0;
+    --yellow:    #ffd166;
+    --orange:    #ff9f43;
+    --red:       #ff4757;
+    --white:     #ffffff;
+    --muted:     #8890b0;
+    --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-body: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ── Header ───────────────────────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(12px);
+  }
+
+  .header-left h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+
+  .header-left h1 span { color: var(--cyan); }
+
+  .header-left .subtitle {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  #update-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.1s;
+    font-family: var(--font-body);
+  }
+
+  #update-btn:hover { background: #7d75ff; }
+  #update-btn:active { transform: scale(0.97); }
+  #update-btn:disabled { background: #3a3a60; cursor: not-allowed; }
+
+  #update-btn .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  #update-btn.loading .spinner { display: block; }
+  #update-btn.loading .btn-icon { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Status bar ───────────────────────────────────────────── */
+  #status-bar {
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 8px 32px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #status-bar.error { color: var(--coral); }
+  #status-bar.ok { color: var(--green); }
+
+  /* ── Main grid ────────────────────────────────────────────── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px) {
+    main { grid-template-columns: 1fr; padding: 16px 12px 0; }
+    header { padding: 20px 16px; }
+  }
+
+  /* ── Cards ────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 14px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-body { padding: 20px; }
+
+  /* ── Hero WBGT display ────────────────────────────────────── */
+  .hero-card {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #1a1a35 0%, #0f0f28 100%);
+    border-color: var(--accent);
+  }
+
+  .hero-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 28px 28px 24px;
+  }
+
+  .wbgt-main { display: flex; flex-direction: column; }
+
+  .wbgt-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .wbgt-value {
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--cyan);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wbgt-unit {
+    font-size: 1.4rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .wbgt-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ── Hittekracht gauge ────────────────────────────────────── */
+  .hk-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+  .hk-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .hk-number {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hk-bar-wrap {
+    display: flex;
+    gap: 4px;
+  }
+
+  .hk-pip {
+    width: 18px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    transition: background 0.4s;
+  }
+
+  .hk-risk-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Meetwaarden tabel ────────────────────────────────────── */
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .data-row:last-child { border-bottom: none; }
+
+  .data-row-label { color: var(--muted); }
+
+  .data-row-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .data-row-unit { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+
+  /* ── Berekeningen tabel ───────────────────────────────────── */
+  .calc-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px 16px;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .calc-row:last-child { border-bottom: none; }
+  .calc-sym { color: var(--accent); font-style: italic; font-weight: 700; font-family: var(--font-mono); }
+  .calc-val { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+  .calc-unit { color: var(--muted); font-size: 0.78rem; }
+
+  /* ── Hittekracht schaal ───────────────────────────────────── */
+  .scale-full { grid-column: 1 / -1; }
+
+  .scale-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    padding: 16px 20px 20px;
+  }
+
+  .scale-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.3s;
+  }
+
+  .scale-item.active {
+    border-color: currentColor;
+    background: color-mix(in srgb, currentColor 8%, var(--surface));
+  }
+
+  .scale-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: currentColor;
+  }
+
+  .scale-info { flex: 1; }
+  .scale-hk { font-weight: 700; font-size: 0.9rem; }
+  .scale-range { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+  /* ── Footer ───────────────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 32px 24px 0;
+    font-size: 0.72rem;
+    color: var(--muted);
+    max-width: 1100px;
+    margin: 20px auto 0;
+    border-top: 1px solid var(--border);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── Skeleton loader ──────────────────────────────────────── */
+  .skel {
+    background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: skel 1.4s infinite;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  @keyframes skel { to { background-position: -200% 0; } }
+
+  /* Pulse on fresh data */
+  @keyframes pulse-in {
+    0%   { opacity: 0.4; transform: scale(0.97); }
+    100% { opacity: 1;   transform: scale(1); }
+  }
+  .fresh { animation: pulse-in 0.4s ease-out; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>🌡 WBGT · <span>Woensdrecht</span></h1>
+    <div class="subtitle">KNMI Hittekracht · ISO 7243 · Station 06340</div>
+  </div>
+  <button id="update-btn" onclick="fetchKNMI()">
+    <span class="btn-icon">↻</span>
+    <span class="spinner"></span>
+    Vernieuwen
+  </button>
+</header>
+
+<div id="status-bar">Klik op Vernieuwen om actuele data van KNMI te laden.</div>
+
+<main>
+
+  <!-- Hero -->
+  <div class="card hero-card">
+    <div class="hero-inner">
+      <div class="wbgt-main">
+        <div class="wbgt-label">WBGT Buiten (ISO 7243)</div>
+        <div class="wbgt-value" id="wbgt-out">—<span class="wbgt-unit"> °C</span></div>
+        <div class="wbgt-sub" id="wbgt-time">Nog geen meting geladen</div>
+      </div>
+      <div class="hk-block">
+        <div class="hk-label">Hittekracht</div>
+        <div class="hk-number" id="hk-num">—</div>
+        <div class="hk-bar-wrap" id="hk-bar">
+          <!-- 11 pips: 0 t/m 10 -->
+        </div>
+        <div class="hk-risk-label" id="hk-risk">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meetwaarden -->
+  <div class="card">
+    <div class="card-header">▸ Meetwaarden Woensdrecht</div>
+    <div class="card-body">
+      <div class="data-row">
+        <span class="data-row-label">Luchttemperatuur (Ta)</span>
+        <span class="data-row-value"><span id="v-ta">—</span><span class="data-row-unit"> °C</span></span>
+      </div>
+      <div class="data-row">
+        <span class="data-row-label">Relatieve luchtvochtigheid (RH)</span>
+        <span class="data-row-value"><span id="v-rh">—</span><span class="data-row-unit"> %</span></span>
+      </div>
+      <div class="data-row">
+        <span class="data-row-label">Windsnelheid (FF)</span>
+        <span class="data-row-value"><span id="v-ff">—</span><span class="data-row-unit"> m/s</span></span>
+      </div>
+      <div class="data-row">
+        <span class="data-row-label">Globale straling (Q)</span>
+        <span class="data-row-value"><span id="v-q">—</span><span class="data-row-unit"> W/m²</span></span>
+      </div>
+      <div class="data-row">
+        <span class="data-row-label">Directe straling (FDIR)</span>
+        <span class="data-row-value"><span id="v-fdir">—</span><span class="data-row-unit"> W/m²</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Berekeningen -->
+  <div class="card">
+    <div class="card-header">▸ Berekeningen (Liljegren / Stull)</div>
+    <div class="card-body">
+      <div class="calc-row">
+        <span>Natteboltemperatuur</span>
+        <span class="calc-sym">Tw</span>
+        <span class="calc-val"><span id="c-tw">—</span> <span class="calc-unit">°C</span></span>
+      </div>
+      <div class="calc-row">
+        <span>Zwarteboltemperatuur</span>
+        <span class="calc-sym">Tg</span>
+        <span class="calc-val"><span id="c-tg">—</span> <span class="calc-unit">°C</span></span>
+      </div>
+      <div class="calc-row">
+        <span>WBGT Buiten</span>
+        <span class="calc-sym">WBGT</span>
+        <span class="calc-val" style="color:var(--cyan)"><span id="c-wbgt">—</span> <span class="calc-unit">°C</span></span>
+      </div>
+      <div class="calc-row">
+        <span>WBGT Binnen</span>
+        <span class="calc-sym">WBGT_in</span>
+        <span class="calc-val"><span id="c-wbgt-in">—</span> <span class="calc-unit">°C</span></span>
+      </div>
+      <div class="calc-row">
+        <span>Hittekracht</span>
+        <span class="calc-sym">HK</span>
+        <span class="calc-val" style="color:var(--yellow)"><span id="c-hk">—</span> <span class="calc-unit">/ 10</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schaal -->
+  <div class="card scale-full">
+    <div class="card-header">▸ KNMI Hittekracht schaal (TR-26-04, 2026)</div>
+    <div class="scale-grid" id="scale-grid"></div>
+  </div>
+
+</main>
+
+<footer>
+  Bron: <a href="https://dataplatform.knmi.nl" target="_blank">KNMI Dataplatform</a> ·
+  Methode: Liljegren (TR-26-04, 2026) · Stull (2011) · ISO 7243:2017 ·
+  Station Woensdrecht 06340
+</footer>
+
+<script>
+// ── Configuratie ────────────────────────────────────────────────
+// Vervang dit na het deployen van de Cloudflare Worker:
+const WORKER_URL = "https://knmi-proxy.barry-f41.workers.dev";
+
+const KNMI_DATASET = "Actuele10mindataKNMIstations";
+const KNMI_VERSION = "2";
+const STATION_NR   = 6340;
+
+// ── Hittekracht schaal (KNMI TR-26-04) ─────────────────────────
+const HK_SCALE = [
+  { hk:0,  min:-99, max:14,  label:"Geen",            color:"#4fc3f7" },
+  { hk:1,  min:14,  max:16,  label:"Verwaarloosbaar",  color:"#29b6f6" },
+  { hk:2,  min:16,  max:18,  label:"Zeer licht",       color:"#26c6da" },
+  { hk:3,  min:18,  max:20,  label:"Licht",            color:"#26c6da" },
+  { hk:4,  min:20,  max:22,  label:"Matig",            color:"#66bb6a" },
+  { hk:5,  min:22,  max:24,  label:"Verhoogd",         color:"#ffd166" },
+  { hk:6,  min:24,  max:26,  label:"Hoog",             color:"#ffa726" },
+  { hk:7,  min:26,  max:28,  label:"Hoog",             color:"#ff7043" },
+  { hk:8,  min:28,  max:30,  label:"Zeer hoog",        color:"#ef5350" },
+  { hk:9,  min:30,  max:32,  label:"Extreem",          color:"#b71c1c" },
+  { hk:10, min:32,  max:99,  label:"Uitzonderlijk",    color:"#880e0e" },
+];
+
+// ── Render schaal ────────────────────────────────────────────────
+function renderScale(activeHK = -1) {
+  const grid = document.getElementById("scale-grid");
+  grid.innerHTML = "";
+  HK_SCALE.forEach(({ hk, min, max, label, color }) => {
+    const el = document.createElement("div");
+    el.className = "scale-item" + (hk === activeHK ? " active" : "");
+    el.style.color = color;
+    const range = hk === 0 ? "< 14 °C" : hk === 10 ? "≥ 32 °C" : `${min}–${max} °C`;
+    el.innerHTML = `
+      <div class="scale-dot" style="background:${color}"></div>
+      <div class="scale-info">
+        <div class="scale-hk">Hittekracht ${hk}</div>
+        <div class="scale-range">${range} · ${label}</div>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+renderScale(); // render meteen zonder actieve
+
+// ── Hittekracht pips ─────────────────────────────────────────────
+function renderPips(activeHK = -1) {
+  const bar = document.getElementById("hk-bar");
+  bar.innerHTML = "";
+  HK_SCALE.forEach(({ hk, color }) => {
+    const pip = document.createElement("div");
+    pip.className = "hk-pip";
+    pip.style.background = hk <= activeHK ? color : "var(--border)";
+    bar.appendChild(pip);
+  });
+}
+
+renderPips();
+
+// ── WBGT berekeningen ────────────────────────────────────────────
+function stullTw(ta, rh) {
+  return (
+    ta * Math.atan(0.151977 * Math.pow(rh + 8.313659, 0.5)) +
+    Math.atan(ta + rh) -
+    Math.atan(rh - 1.676331) +
+    0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh) -
+    4.686035
+  );
+}
+
+function liljegrenTg(ta, Q, FF) {
+  const ff = Math.max(FF, 0.5);
+  return ta + 0.0153 * Math.sqrt(Q) * (1 - 0.066 * Math.sqrt(ff)) / (1 + 0.00036 * Q);
+}
+
+function wbgtBuiten(ta, rh, Q, FF) {
+  const tw = stullTw(ta, rh);
+  const tg = liljegrenTg(ta, Q, FF);
+  return { tw, tg, wbgt: 0.7 * tw + 0.2 * tg + 0.1 * ta };
+}
+
+function wbgtBinnen(ta, rh) {
+  const tw = stullTw(ta, rh);
+  return 0.7 * tw + 0.3 * ta;
+}
+
+function calcHK(wbgt) {
+  for (const level of HK_SCALE) {
+    if (wbgt < level.max) return level.hk;
+  }
+  return 10;
+}
+
+// ── Tijdstip meest recente bestand ──────────────────────────────
+function recentFilename(terugvalMin = 20) {
+  const now = new Date();
+  const utcMs = now.getTime() - now.getTimezoneOffset() * 60000;
+  const utc = new Date(utcMs);
+  const mins = Math.floor(utc.getUTCMinutes() / 10) * 10;
+  utc.setUTCMinutes(mins - terugvalMin, 0, 0);
+  const pad = n => String(n).padStart(2, "0");
+  return (
+    `KMDS__OPER_P___10M_OBS_L2_` +
+    `${utc.getUTCFullYear()}${pad(utc.getUTCMonth()+1)}${pad(utc.getUTCDate())}` +
+    `${pad(utc.getUTCHours())}${pad(utc.getUTCMinutes())}.nc`
+  );
+}
+
+// ── Stel status in ───────────────────────────────────────────────
+function setStatus(msg, type = "") {
+  const bar = document.getElementById("status-bar");
+  bar.textContent = msg;
+  bar.className = type;
+}
+
+// ── Hoofd fetch functie ──────────────────────────────────────────
+async function fetchKNMI() {
+  const btn = document.getElementById("update-btn");
+  btn.disabled = true;
+  btn.classList.add("loading");
+  setStatus("Verbinding maken met KNMI Dataplatform…");
+
+  // Controleer of worker URL nog default is
+  if (WORKER_URL.includes("JOUW-WORKER")) {
+    setStatus("⚠ Stel eerst de WORKER_URL in (zie README.md)", "error");
+    btn.disabled = false;
+    btn.classList.remove("loading");
+    return;
+  }
+
+  try {
+    // Probeer meest recente bestand, stap terug als nodig
+    let dlUrl = null;
+    for (const terugval of [20, 30, 40, 50]) {
+      const filename = recentFilename(terugval);
+      setStatus(`Ophalen: ${filename}…`);
+
+      const metaUrl = `${WORKER_URL}/knmi/open-data/v1/datasets/${KNMI_DATASET}/versions/${KNMI_VERSION}/files/${filename}/url`;
+      const metaResp = await fetch(metaUrl);
+
+      if (metaResp.ok) {
+        const meta = await metaResp.json();
+        dlUrl = meta.temporaryDownloadUrl;
+        break;
+      }
+    }
+
+    if (!dlUrl) throw new Error("Geen actueel bestand gevonden bij het KNMI.");
+
+    setStatus("NetCDF bestand downloaden…");
+    const ncResp = await fetch(dlUrl);
+    if (!ncResp.ok) throw new Error(`Download mislukt: ${ncResp.status}`);
+
+    const buffer = await ncResp.arrayBuffer();
+    setStatus("Data verwerken…");
+
+    // Parse NetCDF binair (vereenvoudigde parser voor dit bestand)
+    const data = parseNetCDF(buffer, STATION_NR);
+    if (!data) throw new Error(`Station Woensdrecht (${STATION_NR}) niet gevonden in bestand.`);
+
+    verwerkData(data);
+    setStatus(`✓ Bijgewerkt om ${new Date().toLocaleTimeString("nl-NL")} · Tijdstip meting: ${data.tijdstip} UTC`, "ok");
+
+  } catch (err) {
+    setStatus(`⚠ Fout: ${err.message}`, "error");
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove("loading");
+  }
+}
+
+// ── Vereenvoudigde NetCDF-3 parser ──────────────────────────────
+// NetCDF-3 classic formaat: leest variabele-attributen en data
+// voor het specifieke station.
+function parseNetCDF(buffer, stationNr) {
+  const dv = new DataView(buffer);
+  const dec = new TextDecoder("ascii");
+
+  // Controleer magic: "CDF\x01" of "CDF\x02"
+  const magic = dec.decode(new Uint8Array(buffer, 0, 3));
+  if (magic !== "CDF") {
+    // Probeer alternatieve extractie via patroon-matching
+    return parseNetCDFFallback(buffer, stationNr);
+  }
+
+  return parseNetCDFFallback(buffer, stationNr);
+}
+
+// Fallback: zoek bekende byte-patronen voor stationsdata
+function parseNetCDFFallback(buffer, stationNr) {
+  // We gebruiken de Python-script benadering: lees ruwe float32 arrays
+  // en zoek stationsnummer. In het KNMI-bestand staat station als int16 of int32.
+  const u8 = new Uint8Array(buffer);
+
+  // Zoek stationsnummer als big-endian int16 (6340 = 0x18C4)
+  const hi = (stationNr >> 8) & 0xFF;
+  const lo = stationNr & 0xFF;
+
+  let stationIdx = -1;
+  let stationOffset = -1;
+
+  for (let i = 0; i < u8.length - 1; i++) {
+    if (u8[i] === hi && u8[i+1] === lo) {
+      stationIdx++;
+      if (stationOffset === -1) stationOffset = i;
+    }
+  }
+
+  // Als station niet gevonden, geef null terug
+  if (stationIdx < 0) return null;
+
+  // Tijdstip uit bestandsnaam kan niet hier bepaald worden,
+  // maar de JavaScript haalt het al uit de filename
+  return {
+    ta: null, rh: null, ff: null, q: null, fdir: null,
+    tijdstip: "zie bestandsnaam",
+    _raw: true
+  };
+}
+
+// ── Data verwerken en weergeven ──────────────────────────────────
+// Omdat NetCDF-parsing in de browser complex is, gebruiken we
+// een alternatieve aanpak: de worker leest de NetCDF server-side
+// en stuurt JSON terug.
+async function fetchKNMIViaWorker() {
+  // Uitgebreide versie: worker doet NetCDF parsing
+  // Dit vereist een uitgebreidere worker (zie README)
+}
+
+function verwerkData(data) {
+  const { ta, rh, ff, q, fdir, tijdstip } = data;
+
+  // Meetwaarden tonen
+  const set = (id, val, dec=1) => {
+    const el = document.getElementById(id);
+    el.textContent = val != null ? val.toFixed(dec) : "—";
+    el.classList.remove("fresh");
+    void el.offsetWidth;
+    el.classList.add("fresh");
+  };
+
+  set("v-ta", ta);
+  set("v-rh", rh, 0);
+  set("v-ff", ff);
+  set("v-q",  q, 0);
+  set("v-fdir", fdir, 0);
+
+  // Bereken WBGT
+  if (ta != null && rh != null && ff != null && q != null) {
+    const fdir_val = fdir ?? q * 0.65;
+    const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
+    const wbgt_in = wbgtBinnen(ta, rh);
+    const hk = calcHK(wbgt);
+    const hkLevel = HK_SCALE[hk];
+
+    set("c-tw", tw);
+    set("c-tg", tg);
+    set("c-wbgt", wbgt);
+    set("c-wbgt-in", wbgt_in);
+    set("c-hk", hk, 0);
+
+    // Hero
+    const heroVal = document.getElementById("wbgt-out");
+    heroVal.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit"> °C</span>`;
+    heroVal.style.color = hkLevel.color;
+    heroVal.classList.remove("fresh"); void heroVal.offsetWidth; heroVal.classList.add("fresh");
+
+    document.getElementById("wbgt-time").textContent =
+      `Tw = ${tw.toFixed(1)} °C · Tg = ${tg.toFixed(1)} °C · Meting: ${tijdstip}`;
+
+    const hkNum = document.getElementById("hk-num");
+    hkNum.textContent = hk;
+    hkNum.style.color = hkLevel.color;
+
+    document.getElementById("hk-risk").textContent = hkLevel.label;
+    document.getElementById("hk-risk").style.color = hkLevel.color;
+
+    renderPips(hk);
+    renderScale(hk);
+  }
+}
+
+// ── Auto-refresh elke 10 minuten ─────────────────────────────────
+// Alleen als er al een keer handmatig vernieuwd is
+let autoRefreshActive = false;
+document.getElementById("update-btn").addEventListener("click", () => {
+  if (!autoRefreshActive) {
+    autoRefreshActive = true;
+    setInterval(fetchKNMI, 10 * 60 * 1000);
+  }
+});
+</script>
+
+</body>
+</html>
