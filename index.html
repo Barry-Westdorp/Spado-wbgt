@@ -580,48 +580,14 @@ async function fetchKNMI() {
   btn.classList.add("loading");
   setStatus("Verbinding maken met KNMI Dataplatform…");
 
-  // Controleer of worker URL nog default is
-  if (WORKER_URL.includes("JOUW-WORKER")) {
-    setStatus("⚠ Stel eerst de WORKER_URL in (zie README.md)", "error");
-    btn.disabled = false;
-    btn.classList.remove("loading");
-    return;
-  }
-
   try {
-    let dlUrl = null;
-    for (const terugval of [20, 30, 40, 50, 60]) {
-      const now = new Date();
-      const utcMs = now.getTime() + now.getTimezoneOffset() * 60000 * -1 - terugval * 60000;
-      const utc = new Date(utcMs);
-      const mins = Math.floor(utc.getUTCMinutes() / 10) * 10;
-      utc.setUTCMinutes(mins, 0, 0);
-      const pad = n => String(n).padStart(2, "0");
-      const filename = `KMDS__OPER_P___10M_OBS_L2_${utc.getUTCFullYear()}${pad(utc.getUTCMonth()+1)}${pad(utc.getUTCDate())}${pad(utc.getUTCHours())}${pad(mins)}.nc`;
-      setStatus(`Ophalen: ${filename}…`);
-      const metaUrl = `${WORKER_URL}/knmi/open-data/v1/datasets/${KNMI_DATASET}/versions/${KNMI_VERSION}/files/${filename}/url`;
-      const metaResp = await fetch(metaUrl);
-      if (metaResp.ok) {
-        const meta = await metaResp.json();
-        dlUrl = meta.temporaryDownloadUrl;
-        break;
-      }
-    }
-    if (!dlUrl) throw new Error("Geen actueel bestand gevonden bij het KNMI.");
+    const resp = await fetch(`${WORKER_URL}/wbgt`);
+    const data = await resp.json();
 
-    setStatus("NetCDF bestand downloaden…");
-    const ncResp = await fetch(dlUrl);
-    if (!ncResp.ok) throw new Error(`Download mislukt: ${ncResp.status}`);
-
-    const buffer = await ncResp.arrayBuffer();
-    setStatus("Data verwerken…");
-
-    // Parse NetCDF binair (vereenvoudigde parser voor dit bestand)
-    const data = parseNetCDF(buffer, STATION_NR);
-    if (!data) throw new Error(`Station Woensdrecht (${STATION_NR}) niet gevonden in bestand.`);
+    if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
 
     verwerkData(data);
-    setStatus(`✓ Bijgewerkt om ${new Date().toLocaleTimeString("nl-NL")} · Tijdstip meting: ${data.tijdstip} UTC`, "ok");
+    setStatus(`✓ Bijgewerkt om ${new Date().toLocaleTimeString("nl-NL")} · Meting: ${data.tijdstip} UTC · ${data.bestand}`, "ok");
 
   } catch (err) {
     setStatus(`⚠ Fout: ${err.message}`, "error");
