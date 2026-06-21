@@ -329,6 +329,73 @@
 
   footer a { color: var(--accent); text-decoration: none; }
 
+
+  /* ── Advies tabs ──────────────────────────────────────────── */
+  .tab-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .advies-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .advies-icon {
+    font-size: 2rem;
+    min-width: 48px;
+    text-align: center;
+  }
+  .advies-titel {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .advies-tekst {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .advies-tabel {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .advies-tabel th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .advies-tabel td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .advies-tabel tr:last-child td { border-bottom: none; }
+  .advies-tabel tr.actief-rij td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
   /* ── Skeleton loader ──────────────────────────────────────── */
   .skel {
     background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
@@ -444,6 +511,134 @@
     </div>
   </div>
 
+
+  <!-- Atletiek Advies Tabs -->
+  <div class="card scale-full" id="advies-card">
+    <div class="card-header">▸ ATLETIEK ADVIES — gebaseerd op actuele WBGT</div>
+
+    <div style="padding: 16px 20px 0;">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="tab-btn active" onclick="setTab('duur')" id="tab-duur">
+          🏃 Duurlopen &amp; Wegatletiek
+        </button>
+        <button class="tab-btn" onclick="setTab('baan')" id="tab-baan">
+          ⚡ Baan &amp; Technisch
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab: Duurlopen -->
+    <div id="panel-duur" class="tab-panel" style="padding:20px;">
+      <div class="advies-banner" id="advies-duur-banner">
+        <div class="advies-icon" id="advies-duur-icon">—</div>
+        <div>
+          <div class="advies-titel" id="advies-duur-titel">Nog geen meting geladen</div>
+          <div class="advies-tekst" id="advies-duur-tekst">Klik op Vernieuwen voor actueel advies.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <table class="advies-tabel">
+          <thead>
+            <tr>
+              <th>WBGT</th>
+              <th>Niveau</th>
+              <th>Advies Atletiekunie / ACSM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hk-row" data-max="15">
+              <td><span style="color:#4fc3f7">● </span>&lt; 15 °C</td>
+              <td style="color:#4fc3f7">Geen risico</td>
+              <td>Normaal trainen en wedstrijden. Blijf hydrateren.</td>
+            </tr>
+            <tr class="hk-row" data-min="15" data-max="18">
+              <td><span style="color:#29b6f6">● </span>15 – 18 °C</td>
+              <td style="color:#29b6f6">Laag</td>
+              <td>Normaal. Extra drinken aanbevolen (0,5L/uur).</td>
+            </tr>
+            <tr class="hk-row" data-min="18" data-max="23">
+              <td><span style="color:#66bb6a">● </span>18 – 23 °C</td>
+              <td style="color:#66bb6a">Matig</td>
+              <td>Verhoog rustpauzes. Goed hydrateren. Let op signalen van oververhitting.</td>
+            </tr>
+            <tr class="hk-row" data-min="23" data-max="25">
+              <td><span style="color:#ffd166">● </span>23 – 25 °C</td>
+              <td style="color:#ffd166">Hoog</td>
+              <td>Atletiekunie: verhoogd risico. Extra koelmaatregelen, langere starts spreiden. Kwetsbare lopers adviseren te stoppen.</td>
+            </tr>
+            <tr class="hk-row" data-min="25" data-max="28">
+              <td><span style="color:#ffa726">● </span>25 – 28 °C</td>
+              <td style="color:#ffa726">Zeer hoog</td>
+              <td>Atletiekunie: overleg met Veiligheidsregio. Overweeg aanpassing (kortere afstand, tijdsverschuiving) of afgelasting.</td>
+            </tr>
+            <tr class="hk-row" data-min="28">
+              <td><span style="color:#ef5350">● </span>&gt; 28 °C</td>
+              <td style="color:#ef5350">Extreem</td>
+              <td>ACSM / Atletiekunie: sterk afraden. Wedstrijden afgelasten of deelname vrijwillig. Acuut levensgevaar bij hitteberoerte.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;">
+          Bron: Atletiekunie (mei 2026) · ACSM Expert Consensus Statement on Exertional Heat Illness (2023)
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Baan & Technisch -->
+    <div id="panel-baan" class="tab-panel" style="padding:20px; display:none;">
+      <div class="advies-banner" id="advies-baan-banner">
+        <div class="advies-icon" id="advies-baan-icon">—</div>
+        <div>
+          <div class="advies-titel" id="advies-baan-titel">Nog geen meting geladen</div>
+          <div class="advies-tekst" id="advies-baan-tekst">Klik op Vernieuwen voor actueel advies.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <table class="advies-tabel">
+          <thead>
+            <tr>
+              <th>WBGT</th>
+              <th>Sprint / Horden</th>
+              <th>Springen / Werpen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hk-row" data-max="18">
+              <td><span style="color:#4fc3f7">● </span>&lt; 18 °C</td>
+              <td>Normaal trainen</td>
+              <td>Normaal trainen</td>
+            </tr>
+            <tr class="hk-row" data-min="18" data-max="23">
+              <td><span style="color:#66bb6a">● </span>18 – 23 °C</td>
+              <td>Normaal. Extra hydratatie.</td>
+              <td>Geen beperkingen. Schaduw zoeken bij wachten.</td>
+            </tr>
+            <tr class="hk-row" data-min="23" data-max="27">
+              <td><span style="color:#ffd166">● </span>23 – 27 °C</td>
+              <td>Verhoog herstelperiode tussen series. Koelvest/schaduw.</td>
+              <td>Meer rust tussen pogingen. Vermijd lang in zon wachten.</td>
+            </tr>
+            <tr class="hk-row" data-min="27" data-max="30">
+              <td><span style="color:#ffa726">● </span>27 – 30 °C</td>
+              <td>Beperkt tot essentiële series. Intensieve warming-up vermijden.</td>
+              <td>Rusttijd verdubbelen. Koeling verplicht tussen pogingen. Afbreken bij klachten.</td>
+            </tr>
+            <tr class="hk-row" data-min="30">
+              <td><span style="color:#ef5350">● </span>&gt; 30 °C</td>
+              <td>Afgelasten of verplaatsen naar koeler moment.</td>
+              <td>Afgelasten of verplaatsen. Zelfs technische onderdelen vormen risico bij extreme hitte.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;">
+          Bron: ACSM (2023) · eigen interpretatie op basis van inspanningsduur en intensiteit per discipline
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Schaal -->
   <div class="card scale-full">
     <div class="card-header">▸ KNMI Hittekracht schaal (TR-26-04, 2026)</div>
@@ -481,6 +676,56 @@ const HK_SCALE = [
   { hk:9,  min:30,  max:32,  label:"Extreem",          color:"#b71c1c" },
   { hk:10, min:32,  max:99,  label:"Uitzonderlijk",    color:"#880e0e" },
 ];
+
+
+// ── Tab switcher ─────────────────────────────────────────────
+function setTab(tab) {
+  document.getElementById("panel-duur").style.display = tab === "duur" ? "block" : "none";
+  document.getElementById("panel-baan").style.display = tab === "baan" ? "block" : "none";
+  document.getElementById("tab-duur").classList.toggle("active", tab === "duur");
+  document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
+}
+
+// ── Advies updaten op basis van WBGT ─────────────────────────
+function updateAdvies(wbgt) {
+  // Duurlopen advies
+  const duurNiveaus = [
+    { max: 15,  kleur: "#4fc3f7", icon: "✅", titel: "Geen risico",  tekst: "Normaal trainen en wedstrijden. Blijf goed hydrateren." },
+    { max: 18,  kleur: "#29b6f6", icon: "✅", titel: "Laag risico",  tekst: "Normaal. Drinken elke 15-20 minuten aanbevolen (0,5L/uur)." },
+    { max: 23,  kleur: "#66bb6a", icon: "⚠️", titel: "Matig risico", tekst: "Verhoog rustpauzes. Goed hydrateren. Let op signalen van oververhitting bij deelnemers." },
+    { max: 25,  kleur: "#ffd166", icon: "⚠️", titel: "Hoog risico — extra maatregelen",  tekst: "Atletiekunie: verhoogd risico. Extra koelmaatregelen, langere starts spreiden. Kwetsbare lopers adviseren te stoppen." },
+    { max: 28,  kleur: "#ffa726", icon: "🚨", titel: "Zeer hoog risico — overleg Veiligheidsregio", tekst: "Atletiekunie: overleg met Veiligheidsregio verplicht. Overweeg aanpassing (kortere afstand, tijdsverschuiving) of volledige afgelasting." },
+    { max: 999, kleur: "#ef5350", icon: "🛑", titel: "Extreem — afgelasten", tekst: "ACSM / Atletiekunie: sterk afraden. Wedstrijden afgelasten of deelname vrijwillig maken. Acuut gevaar voor hitteberoerte." },
+  ];
+
+  const baanNiveaus = [
+    { max: 18,  kleur: "#4fc3f7", icon: "✅", titel: "Geen risico",  tekst: "Normaal trainen voor alle baanonderdelen. Reguliere hydratatie volstaat." },
+    { max: 23,  kleur: "#66bb6a", icon: "✅", titel: "Laag risico",  tekst: "Sprint en horden: normaal. Springen/werpen: schaduw zoeken bij wachten. Extra drinken." },
+    { max: 27,  kleur: "#ffd166", icon: "⚠️", titel: "Matig risico — rust verhogen", tekst: "Sprint/horden: langere herstelperiode tussen series. Springen/werpen: meer rust tussen pogingen, vermijd lang in zon wachten." },
+    { max: 30,  kleur: "#ffa726", icon: "🚨", titel: "Hoog risico — beperken", tekst: "Sprint/horden: beperkt tot essentiële series, intensieve warming-up vermijden. Springen/werpen: rusttijd verdubbelen, koeling verplicht tussen pogingen." },
+    { max: 999, kleur: "#ef5350", icon: "🛑", titel: "Extreem — afgelasten of verplaatsen", tekst: "Zelfs technische onderdelen vormen gevaar. Afgelasten of verplaatsen naar koeler moment van de dag." },
+  ];
+
+  function setAdvies(prefix, niveaus) {
+    const niveau = niveaus.find(n => wbgt < n.max);
+    if (!niveau) return;
+    document.getElementById(`advies-${prefix}-icon`).textContent = niveau.icon;
+    document.getElementById(`advies-${prefix}-titel`).textContent = niveau.titel;
+    document.getElementById(`advies-${prefix}-titel`).style.color = niveau.kleur;
+    document.getElementById(`advies-${prefix}-tekst`).textContent = niveau.tekst;
+    document.getElementById(`advies-${prefix}-banner`).style.borderColor = niveau.kleur;
+  }
+
+  setAdvies("duur", duurNiveaus);
+  setAdvies("baan", baanNiveaus);
+
+  // Markeer actieve rij in tabel
+  document.querySelectorAll(".hk-row").forEach(row => {
+    const min = parseFloat(row.dataset.min || 0);
+    const max = parseFloat(row.dataset.max || 999);
+    row.classList.toggle("actief-rij", wbgt >= min && wbgt < max);
+  });
+}
 
 // ── Render schaal ────────────────────────────────────────────────
 function renderScale(activeHK = -1) {
@@ -705,6 +950,7 @@ function verwerkData(data) {
     document.getElementById("hk-risk").style.color = hkLevel.color;
 
     renderPips(hk);
+    updateAdvies(wbgt);
     renderScale(hk);
   }
 }
