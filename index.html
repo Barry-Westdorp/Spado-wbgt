@@ -946,8 +946,13 @@ function verwerkData(data) {
     heroVal.style.color = hkLevel.color;
     heroVal.classList.remove("fresh"); void heroVal.offsetWidth; heroVal.classList.add("fresh");
 
+    // Meettijd: laatste volle 10-minuten interval
+    const nu10 = new Date();
+    nu10.setSeconds(0, 0);
+    nu10.setMinutes(Math.floor(nu10.getMinutes() / 10) * 10 - 10);
+    const meetStr = nu10.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
     document.getElementById("wbgt-time").textContent =
-      `Tw = ${tw.toFixed(1)} °C · Tg = ${tg.toFixed(1)} °C · Meting: ${tijdstip}`;
+      `Tw = ${tw.toFixed(1)} °C · Tg = ${tg.toFixed(1)} °C · Meting ca. ${meetStr}`;
 
     const hkNum = document.getElementById("hk-num");
     hkNum.textContent = hk;
