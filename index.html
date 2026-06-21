@@ -128,13 +128,6 @@
   }
 
   @media (max-width: 700px) {
-    .hero-inner { flex-direction: column !important; gap: 16px !important; }
-    .wbgt-value { font-size: 3rem !important; }
-    #humidex-out { font-size: 2.2rem !important; }
-    .hk-block { align-items: flex-start !important; }
-    .hk-bar-wrap { flex-wrap: wrap; gap: 3px; }
-  }
-  @media (max-width: 700px) {
     main { grid-template-columns: 1fr; padding: 16px 12px 0; }
     header { padding: 20px 16px; }
   }
@@ -403,6 +396,10 @@
   .advies-tabel tr:last-child td { border-bottom: none; }
   .advies-tabel tr.actief-rij td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 
+  /* ── Index grootte classes ──────────────────────────────── */
+  .idx-groot { font-size: 4.5rem !important; }
+  .idx-klein { font-size: 2.2rem !important; }
+
   /* ── Skeleton loader ──────────────────────────────────────── */
   .skel {
     background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
@@ -449,11 +446,11 @@
           <div style="display:flex;align-items:baseline;gap:16px;">
             <div>
               <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">WBGT</div>
-              <div id="wbgt-out" class="wbgt-value" style="transition:font-size 0.2s;">—<span class="wbgt-unit"> °C</span></div>
+              <div id="wbgt-out" class="wbgt-value idx-groot">—<span class="wbgt-unit"> °C</span></div>
             </div>
             <div>
               <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Gevoelstemp. (NOAA)</div>
-              <div id="humidex-out" class="wbgt-value" style="font-size:2.8rem;color:var(--yellow);transition:font-size 0.2s;">—<span class="wbgt-unit"> °C</span></div>
+              <div id="humidex-out" class="wbgt-value idx-klein" style="color:var(--yellow);">—<span class="wbgt-unit"> °C</span></div>
             </div>
           </div>
         </div>
@@ -788,20 +785,21 @@ function setIndexKeuze(keuze) {
   const btnH   = document.getElementById("btn-humidex");
   const uitleg = document.getElementById("index-uitleg");
 
+  const elWbgt = document.getElementById("wbgt-out");
+  const elNoaa = document.getElementById("humidex-out");
+
   if (keuze === "wbgt") {
     btnW.style.background = "var(--accent)"; btnW.style.color = "white";
     btnH.style.background = "transparent";   btnH.style.color = "var(--muted)";
     uitleg.textContent = "ISO 7243 · wind + straling";
-    // WBGT groot, NOAA klein
-    document.getElementById("wbgt-out").style.fontSize = "4.5rem";
-    document.getElementById("humidex-out").style.fontSize = "2.5rem";
+    elWbgt.classList.add("idx-groot"); elWbgt.classList.remove("idx-klein");
+    elNoaa.classList.add("idx-klein"); elNoaa.classList.remove("idx-groot");
   } else {
     btnH.style.background = "var(--yellow)"; btnH.style.color = "#000";
     btnW.style.background = "transparent";   btnW.style.color = "var(--muted)";
     uitleg.textContent = "NOAA Heat Index · conform SPADO tabel";
-    // NOAA groot, WBGT klein
-    document.getElementById("humidex-out").style.fontSize = "4.5rem";
-    document.getElementById("wbgt-out").style.fontSize = "2.5rem";
+    elNoaa.classList.add("idx-groot"); elNoaa.classList.remove("idx-klein");
+    elWbgt.classList.add("idx-klein"); elWbgt.classList.remove("idx-groot");
   }
 
   // Update adviezen en hittekracht op basis van actieve index
