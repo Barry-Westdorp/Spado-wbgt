@@ -128,6 +128,13 @@
   }
 
   @media (max-width: 700px) {
+    .hero-inner { flex-direction: column !important; gap: 16px !important; }
+    .wbgt-value { font-size: 3rem !important; }
+    #humidex-out { font-size: 2.2rem !important; }
+    .hk-block { align-items: flex-start !important; }
+    .hk-bar-wrap { flex-wrap: wrap; gap: 3px; }
+  }
+  @media (max-width: 700px) {
     main { grid-template-columns: 1fr; padding: 16px 12px 0; }
     header { padding: 20px 16px; }
   }
@@ -165,11 +172,11 @@
 
   .hero-inner {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 24px;
-    padding: 28px 28px 24px;
+    gap: 20px;
+    padding: 24px 24px 20px;
   }
 
   .wbgt-main { display: flex; flex-direction: column; }
@@ -438,21 +445,23 @@
     <div class="hero-inner">
       <div class="wbgt-main">
         <div class="wbgt-label">WBGT Buiten (ISO 7243)</div>
-        <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;">
-          <div>
-            <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">WBGT</div>
-            <div class="wbgt-value" id="wbgt-out">—<span class="wbgt-unit"> °C</span></div>
-          </div>
-          <div>
-            <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Gevoelstemp. (NOAA)</div>
-            <div class="wbgt-value" id="humidex-out" style="font-size:3rem;color:var(--yellow);">—<span class="wbgt-unit"> °C</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:baseline;gap:16px;">
+            <div>
+              <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">WBGT</div>
+              <div id="wbgt-out" class="wbgt-value" style="transition:font-size 0.2s;">—<span class="wbgt-unit"> °C</span></div>
+            </div>
+            <div>
+              <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Gevoelstemp. (NOAA)</div>
+              <div id="humidex-out" class="wbgt-value" style="font-size:2.8rem;color:var(--yellow);transition:font-size 0.2s;">—<span class="wbgt-unit"> °C</span></div>
+            </div>
           </div>
         </div>
         <div class="wbgt-sub" id="wbgt-time">Nog geen meting geladen</div>
       </div>
 
       <!-- Index schakelaar -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex-shrink:0;">
         <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Waarschuwing op basis van</div>
         <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
           <button id="btn-wbgt" onclick="setIndexKeuze('wbgt')"
