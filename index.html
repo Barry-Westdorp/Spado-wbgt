@@ -1127,13 +1127,10 @@ function verwerkData(data) {
 
 
 // ── Auto-refresh elke 10 minuten ─────────────────────────────────
-// Alleen als er al een keer handmatig vernieuwd is
-let autoRefreshActive = false;
-document.getElementById("update-btn").addEventListener("click", () => {
-  if (!autoRefreshActive) {
-    autoRefreshActive = true;
-    setInterval(fetchKNMI, 10 * 60 * 1000);
-  }
+// Laad direct bij openen en daarna elke 10 minuten
+window.addEventListener("load", () => {
+  fetchKNMI();
+  setInterval(fetchKNMI, 10 * 60 * 1000);
 });
 </script>
 
