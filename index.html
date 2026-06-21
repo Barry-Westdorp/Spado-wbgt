@@ -469,7 +469,7 @@
         </div>
         <input type="hidden" id="index-keuze" value="wbgt">
       </div>
-      <div class="hk-block">
+      <div class="hk-block" id="hk-block">
         <div class="hk-label">Hittekracht</div>
         <div class="hk-number" id="hk-num">—</div>
         <div class="hk-bar-wrap" id="hk-bar">
@@ -775,37 +775,44 @@ const HK_SCALE = [
 function setIndexKeuze(keuze) {
   document.getElementById("index-keuze").value = keuze;
 
-  const btnW = document.getElementById("btn-wbgt");
-  const btnH = document.getElementById("btn-humidex");
+  const btnW   = document.getElementById("btn-wbgt");
+  const btnH   = document.getElementById("btn-humidex");
   const uitleg = document.getElementById("index-uitleg");
 
   if (keuze === "wbgt") {
     btnW.style.background = "var(--accent)"; btnW.style.color = "white";
     btnH.style.background = "transparent";   btnH.style.color = "var(--muted)";
     uitleg.textContent = "ISO 7243 · wind + straling";
+    // WBGT groot, NOAA klein
+    document.getElementById("wbgt-out").style.fontSize = "4.5rem";
+    document.getElementById("humidex-out").style.fontSize = "2.5rem";
   } else {
     btnH.style.background = "var(--yellow)"; btnH.style.color = "#000";
     btnW.style.background = "transparent";   btnW.style.color = "var(--muted)";
     uitleg.textContent = "NOAA Heat Index · conform SPADO tabel";
+    // NOAA groot, WBGT klein
+    document.getElementById("humidex-out").style.fontSize = "4.5rem";
+    document.getElementById("wbgt-out").style.fontSize = "2.5rem";
   }
 
-  // Herbereken waarschuwingen met laatste data als die beschikbaar is
-  const wbgtVal   = parseFloat(document.getElementById("c-wbgt").textContent);
-  const humidexVal = parseFloat(document.getElementById("c-humidex").textContent);
-  if (!isNaN(wbgtVal) && !isNaN(humidexVal)) {
-    const idx = keuze === "humidex" ? humidexVal : wbgtVal;
-    updateAdvies(idx);
-    updateHKDisplay(idx, keuze);
+  // Update adviezen en hittekracht op basis van actieve index
+  const wbgtVal = parseFloat(document.getElementById("c-wbgt").textContent);
+  const noaaVal = parseFloat(document.getElementById("c-humidex").textContent);
+  if (!isNaN(wbgtVal) && !isNaN(noaaVal)) {
+    const actief = keuze === "humidex" ? noaaVal : wbgtVal;
+    updateAdvies(actief);
+
+    // Hittekracht altijd op WBGT
+    const hk = calcHK(wbgtVal);
+    const hkLevel = HK_SCALE[hk];
+    document.getElementById("hk-num").textContent = hk;
+    document.getElementById("hk-num").style.color = hkLevel.color;
+    document.getElementById("hk-risk").textContent = hkLevel.label;
+    document.getElementById("hk-risk").style.color = hkLevel.color;
+    renderPips(hk); renderScale(hk);
   }
 }
 
-function updateHKDisplay(indexWaarde, keuze) {
-  const hk = calcHK(keuze === "wbgt" ? indexWaarde : null, keuze === "humidex" ? indexWaarde : null, keuze);
-  const hkLevel = HK_SCALE[Math.min(hk, 10)];
-  document.getElementById("hk-num").textContent = keuze === "wbgt" ? hk : "—";
-  renderPips(keuze === "wbgt" ? hk : -1);
-  renderScale(keuze === "wbgt" ? hk : -1);
-}
 
 // ── Tab switcher ─────────────────────────────────────────────
 function setTab(tab) {
