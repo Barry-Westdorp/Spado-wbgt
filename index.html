@@ -836,7 +836,7 @@ async function fetchKNMI() {
     const nu = new Date();
     const minuten = Math.floor(nu.getMinutes() / 10) * 10;
     const meetTijd = new Date(nu);
-    meetTijd.setMinutes(minuten - 10, 0, 0); // vorige 10-min blok
+    meetTijd.setMinutes(minuten, 0, 0); // huidig 10-min blok
     const meetStr = meetTijd.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
     const bronStr = data.bron || "Weerlive.nl";
     setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · Meting ca. ${meetStr} · ${bronStr}`, "ok");
@@ -946,10 +946,10 @@ function verwerkData(data) {
     heroVal.style.color = hkLevel.color;
     heroVal.classList.remove("fresh"); void heroVal.offsetWidth; heroVal.classList.add("fresh");
 
-    // Meettijd: laatste volle 10-minuten interval
+    // Meettijd: laatste volle 10-minuten interval (09:32 → 09:30)
     const nu10 = new Date();
     nu10.setSeconds(0, 0);
-    nu10.setMinutes(Math.floor(nu10.getMinutes() / 10) * 10 - 10);
+    nu10.setMinutes(Math.floor(nu10.getMinutes() / 10) * 10);
     const meetStr = nu10.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
     document.getElementById("wbgt-time").textContent =
       `Tw = ${tw.toFixed(1)} °C · Tg = ${tg.toFixed(1)} °C · Meting ca. ${meetStr}`;
