@@ -183,18 +183,22 @@
   }
 
   .wbgt-value {
-    font-size: 4.5rem;
     font-weight: 800;
     line-height: 1;
     color: var(--cyan);
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    transition: font-size 0.2s;
   }
 
   .wbgt-unit {
-    font-size: 1.4rem;
     color: var(--muted);
     font-weight: 400;
+    transition: font-size 0.2s;
   }
 
   .wbgt-sub {
@@ -397,8 +401,10 @@
   .advies-tabel tr.actief-rij td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 
   /* ── Index grootte classes ──────────────────────────────── */
-  .idx-groot { font-size: 4.5rem !important; }
-  .idx-klein { font-size: 2.2rem !important; }
+  .idx-groot { font-size: 3.2rem !important; }
+  .idx-klein { font-size: 1.8rem !important; }
+  .idx-groot .wbgt-unit { font-size: 1.4rem !important; }
+  .idx-klein .wbgt-unit { font-size: 1rem !important; }
 
   /* ── Skeleton loader ──────────────────────────────────────── */
   .skel {
@@ -442,15 +448,15 @@
     <div class="hero-inner">
       <div class="wbgt-main">
         <div class="wbgt-label">WBGT Buiten (ISO 7243)</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:baseline;gap:16px;">
-            <div>
-              <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">WBGT</div>
-              <div id="wbgt-out" class="wbgt-value idx-groot">—<span class="wbgt-unit"> °C</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:nowrap;">
+            <div style="min-width:0;">
+              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">WBGT</div>
+              <div id="wbgt-out" class="wbgt-value idx-groot">—<span class="wbgt-unit">°C</span></div>
             </div>
-            <div>
-              <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Gevoelstemp. (NOAA)</div>
-              <div id="humidex-out" class="wbgt-value idx-klein" style="color:var(--yellow);">—<span class="wbgt-unit"> °C</span></div>
+            <div style="min-width:0;">
+              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Gevoelstemp. (NOAA)</div>
+              <div id="humidex-out" class="wbgt-value idx-klein" style="color:var(--yellow);">—<span class="wbgt-unit">°C</span></div>
             </div>
           </div>
         </div>
