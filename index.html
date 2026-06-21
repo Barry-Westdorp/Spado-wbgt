@@ -832,7 +832,14 @@ async function fetchKNMI() {
     if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
 
     verwerkData(data);
-    setStatus(`✓ Bijgewerkt om ${new Date().toLocaleTimeString("nl-NL")} · Meting: ${data.tijdstip} UTC · ${data.bestand}`, "ok");
+    // Bereken laatste volle 10-minuten interval
+    const nu = new Date();
+    const minuten = Math.floor(nu.getMinutes() / 10) * 10;
+    const meetTijd = new Date(nu);
+    meetTijd.setMinutes(minuten - 10, 0, 0); // vorige 10-min blok
+    const meetStr = meetTijd.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+    const bronStr = data.bron || "Weerlive.nl";
+    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · Meting ca. ${meetStr} · ${bronStr}`, "ok");
 
   } catch (err) {
     setStatus(`⚠ Fout: ${err.message}`, "error");
@@ -954,6 +961,12 @@ function verwerkData(data) {
     renderScale(hk);
   }
 }
+
+// ── Laad data direct bij openen pagina ───────────────────────
+window.addEventListener("load", () => {
+  fetchKNMI();
+  setInterval(fetchKNMI, 10 * 60 * 1000); // daarna elke 10 min
+});
 
 // ── Auto-refresh elke 10 minuten ─────────────────────────────────
 // Alleen als er al een keer handmatig vernieuwd is
