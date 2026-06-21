@@ -438,8 +438,36 @@
     <div class="hero-inner">
       <div class="wbgt-main">
         <div class="wbgt-label">WBGT Buiten (ISO 7243)</div>
-        <div class="wbgt-value" id="wbgt-out">—<span class="wbgt-unit"> °C</span></div>
+        <div style="display:flex;align-items:baseline;gap:24px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">WBGT</div>
+            <div class="wbgt-value" id="wbgt-out">—<span class="wbgt-unit"> °C</span></div>
+          </div>
+          <div>
+            <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Humidex</div>
+            <div class="wbgt-value" id="humidex-out" style="font-size:3rem;color:var(--yellow);">—<span class="wbgt-unit"> °C</span></div>
+          </div>
+        </div>
         <div class="wbgt-sub" id="wbgt-time">Nog geen meting geladen</div>
+      </div>
+
+      <!-- Index schakelaar -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+        <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Waarschuwing op basis van</div>
+        <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+          <button id="btn-wbgt" onclick="setIndexKeuze('wbgt')"
+            style="padding:8px 18px;border:none;background:var(--accent);color:white;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:var(--font-body);">
+            WBGT
+          </button>
+          <button id="btn-humidex" onclick="setIndexKeuze('humidex')"
+            style="padding:8px 18px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:0.85rem;cursor:pointer;font-family:var(--font-body);">
+            Humidex
+          </button>
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);text-align:center;">
+          <span id="index-uitleg">ISO 7243 · wind + straling</span>
+        </div>
+        <input type="hidden" id="index-keuze" value="wbgt">
       </div>
       <div class="hk-block">
         <div class="hk-label">Hittekracht</div>
@@ -507,6 +535,16 @@
         <span>Hittekracht</span>
         <span class="calc-sym">HK</span>
         <span class="calc-val" style="color:var(--yellow)"><span id="c-hk">—</span> <span class="calc-unit">/ 10</span></span>
+      </div>
+      <div class="calc-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;">
+        <span>Humidex</span>
+        <span class="calc-sym" style="color:var(--yellow)">Hx</span>
+        <span class="calc-val" style="color:var(--yellow)"><span id="c-humidex">—</span> <span class="calc-unit">°C</span></span>
+      </div>
+      <div class="calc-row">
+        <span>Humidex risico</span>
+        <span class="calc-sym" style="color:var(--yellow)">HxR</span>
+        <span class="calc-val"><span id="c-humidex-risico" style="font-size:0.85rem;">—</span></span>
       </div>
     </div>
   </div>
@@ -733,6 +771,42 @@ const HK_SCALE = [
 ];
 
 
+// ── Index keuze schakelaar ────────────────────────────────────
+function setIndexKeuze(keuze) {
+  document.getElementById("index-keuze").value = keuze;
+
+  const btnW = document.getElementById("btn-wbgt");
+  const btnH = document.getElementById("btn-humidex");
+  const uitleg = document.getElementById("index-uitleg");
+
+  if (keuze === "wbgt") {
+    btnW.style.background = "var(--accent)"; btnW.style.color = "white";
+    btnH.style.background = "transparent";   btnH.style.color = "var(--muted)";
+    uitleg.textContent = "ISO 7243 · wind + straling";
+  } else {
+    btnH.style.background = "var(--yellow)"; btnH.style.color = "#000";
+    btnW.style.background = "transparent";   btnW.style.color = "var(--muted)";
+    uitleg.textContent = "Klassiek · alleen temp + vochtigheid";
+  }
+
+  // Herbereken waarschuwingen met laatste data als die beschikbaar is
+  const wbgtVal   = parseFloat(document.getElementById("c-wbgt").textContent);
+  const humidexVal = parseFloat(document.getElementById("c-humidex").textContent);
+  if (!isNaN(wbgtVal) && !isNaN(humidexVal)) {
+    const idx = keuze === "humidex" ? humidexVal : wbgtVal;
+    updateAdvies(idx);
+    updateHKDisplay(idx, keuze);
+  }
+}
+
+function updateHKDisplay(indexWaarde, keuze) {
+  const hk = calcHK(keuze === "wbgt" ? indexWaarde : null, keuze === "humidex" ? indexWaarde : null, keuze);
+  const hkLevel = HK_SCALE[Math.min(hk, 10)];
+  document.getElementById("hk-num").textContent = keuze === "wbgt" ? hk : "—";
+  renderPips(keuze === "wbgt" ? hk : -1);
+  renderScale(keuze === "wbgt" ? hk : -1);
+}
+
 // ── Tab switcher ─────────────────────────────────────────────
 function setTab(tab) {
   document.getElementById("panel-duur").style.display = tab === "duur" ? "block" : "none";
@@ -843,6 +917,24 @@ function wbgtBuiten(ta, rh, Q, FF) {
   return { tw, tg, wbgt: 0.7 * tw + 0.2 * tg + 0.1 * ta };
 }
 
+// ── Humidex berekening ────────────────────────────────────────
+// Humidex = Ta + 0.5555 * (dampspanning - 10)
+// dampspanning e = 6.105 * exp(17.27 * Td / (237.7 + Td))
+// Td (dauwpunt) benaderd via Magnus
+function berekenHumidex(ta, rh) {
+  const gamma = (17.625 * ta) / (243.04 + ta) + Math.log(rh / 100);
+  const td = (243.04 * gamma) / (17.625 - gamma); // dauwpunt
+  const e = 6.105 * Math.exp(17.27 * td / (237.7 + td));
+  const humidex = ta + 0.5555 * (e - 10);
+  return Math.round(humidex * 10) / 10;
+}
+
+// Bepaal actieve index op basis van schakelaar
+function actieveIndex(wbgt, humidex) {
+  const modus = document.getElementById("index-keuze")?.value || "wbgt";
+  return modus === "humidex" ? humidex : wbgt;
+}
+
 function wbgtBinnen(ta, rh) {
   const tw = stullTw(ta, rh);
   return 0.7 * tw + 0.3 * ta;
@@ -891,16 +983,10 @@ async function fetchKNMI() {
     if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
 
     verwerkData(data);
-    // Bereken laatste volle 10-minuten interval
-    const nu = new Date();
-    const minuten = Math.floor(nu.getMinutes() / 10) * 10;
-    const meetTijd = new Date(nu);
-    meetTijd.setMinutes(minuten, 0, 0); // huidig 10-min blok
-    const meetStr = meetTijd.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
     const bronStr = data.bron || "Weerlive.nl";
-    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · Meting ca. ${meetStr} · ${bronStr}`, "ok");
+    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · ${bronStr}`, "ok");
 
-  } catch (err) {
+    } catch (err) {
     setStatus(`⚠ Fout: ${err.message}`, "error");
     console.error(err);
   } finally {
@@ -968,69 +1054,77 @@ async function fetchKNMIViaWorker() {
 }
 
 function verwerkData(data) {
-  const { ta, rh, ff, q, fdir, tijdstip } = data;
+  const { ta, rh, ff, q, fdir } = data;
 
-  // Meetwaarden tonen
   const set = (id, val, dec=1) => {
     const el = document.getElementById(id);
+    if (!el) return;
     el.textContent = val != null ? val.toFixed(dec) : "—";
-    el.classList.remove("fresh");
-    void el.offsetWidth;
-    el.classList.add("fresh");
+    el.classList.remove("fresh"); void el.offsetWidth; el.classList.add("fresh");
   };
 
-  set("v-ta", ta);
-  set("v-rh", rh, 0);
-  set("v-ff", ff);
-  set("v-q",  q, 0);
-  set("v-fdir", fdir, 0);
+  set("v-ta", ta); set("v-rh", rh, 0); set("v-ff", ff);
+  set("v-q", q, 0); set("v-fdir", fdir, 0);
 
-  // Bereken WBGT
-  if (ta != null && rh != null && ff != null && q != null) {
-    const fdir_val = fdir ?? q * 0.65;
-    const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
-    const wbgt_in = wbgtBinnen(ta, rh);
-    const hk = calcHK(wbgt);
-    const hkLevel = HK_SCALE[hk];
+  if (ta == null || rh == null || ff == null || q == null) return;
 
-    set("c-tw", tw);
-    set("c-tg", tg);
-    set("c-wbgt", wbgt);
-    set("c-wbgt-in", wbgt_in);
-    set("c-hk", hk, 0);
+  const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
+  const wbgt_in = wbgtBinnen(ta, rh);
+  const hk = calcHK(wbgt);
+  const hkLevel = HK_SCALE[hk];
 
-    // Hero
-    const heroVal = document.getElementById("wbgt-out");
-    heroVal.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit"> °C</span>`;
-    heroVal.style.color = hkLevel.color;
-    heroVal.classList.remove("fresh"); void heroVal.offsetWidth; heroVal.classList.add("fresh");
+  // Humidex
+  const humidex = berekenHumidex(ta, rh);
+  const humidexRisico = humidex < 20 ? "Geen ongemak" :
+                        humidex < 25 ? "Licht ongemak" :
+                        humidex < 30 ? "Merkbaar ongemak" :
+                        humidex < 35 ? "Aanzienlijk ongemak" :
+                        humidex < 40 ? "Groot ongemak" :
+                        humidex < 45 ? "Gevaarlijk" : "Hitteberoerte mogelijk";
+  const humidexKleur = humidex < 25 ? "var(--green)" : humidex < 35 ? "var(--yellow)" :
+                       humidex < 40 ? "var(--orange)" : "var(--red)";
 
-    // Meettijd: laatste volle 10-minuten interval (09:32 → 09:30)
-    const nu10 = new Date();
-    nu10.setSeconds(0, 0);
-    nu10.setMinutes(Math.floor(nu10.getMinutes() / 10) * 10);
-    const meetStr = nu10.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
-    document.getElementById("wbgt-time").textContent =
-      `Tw = ${tw.toFixed(1)} °C · Tg = ${tg.toFixed(1)} °C · Meting ca. ${meetStr}`;
+  set("c-tw", tw); set("c-tg", tg); set("c-wbgt", wbgt);
+  set("c-wbgt-in", wbgt_in); set("c-hk", hk, 0); set("c-humidex", humidex);
 
-    const hkNum = document.getElementById("hk-num");
-    hkNum.textContent = hk;
-    hkNum.style.color = hkLevel.color;
+  const risicoEl = document.getElementById("c-humidex-risico");
+  if (risicoEl) { risicoEl.textContent = humidexRisico; risicoEl.style.color = humidexKleur; }
 
-    document.getElementById("hk-risk").textContent = hkLevel.label;
-    document.getElementById("hk-risk").style.color = hkLevel.color;
+  // Hero WBGT
+  const heroWbgt = document.getElementById("wbgt-out");
+  heroWbgt.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit"> °C</span>`;
+  heroWbgt.style.color = hkLevel.color;
+  heroWbgt.classList.remove("fresh"); void heroWbgt.offsetWidth; heroWbgt.classList.add("fresh");
 
-    renderPips(hk);
-    updateAdvies(wbgt);
-    renderScale(hk);
+  // Hero Humidex
+  const heroHx = document.getElementById("humidex-out");
+  if (heroHx) {
+    heroHx.innerHTML = `${humidex.toFixed(1)}<span class="wbgt-unit"> °C</span>`;
+    heroHx.style.color = humidexKleur;
+    heroHx.classList.remove("fresh"); void heroHx.offsetWidth; heroHx.classList.add("fresh");
   }
+
+  // Meettijd
+  const nu10 = new Date();
+  nu10.setSeconds(0, 0);
+  nu10.setMinutes(Math.floor(nu10.getMinutes() / 10) * 10);
+  const meetStr = nu10.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+  document.getElementById("wbgt-time").textContent =
+    `WBGT ${wbgt.toFixed(1)} · Humidex ${humidex.toFixed(1)} · Meting ca. ${meetStr}`;
+
+  // Hittekracht
+  document.getElementById("hk-num").textContent = hk;
+  document.getElementById("hk-num").style.color = hkLevel.color;
+  document.getElementById("hk-risk").textContent = hkLevel.label;
+  document.getElementById("hk-risk").style.color = hkLevel.color;
+  renderPips(hk); renderScale(hk);
+
+  // Advies op basis van gekozen index
+  const keuze = document.getElementById("index-keuze")?.value || "wbgt";
+  const indexWaarde = keuze === "humidex" ? humidex : wbgt;
+  updateAdvies(indexWaarde);
 }
 
-// ── Laad data direct bij openen pagina ───────────────────────
-window.addEventListener("load", () => {
-  fetchKNMI();
-  setInterval(fetchKNMI, 10 * 60 * 1000); // daarna elke 10 min
-});
 
 // ── Auto-refresh elke 10 minuten ─────────────────────────────────
 // Alleen als er al een keer handmatig vernieuwd is
