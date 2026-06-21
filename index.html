@@ -547,40 +547,35 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="hk-row" data-max="15">
-              <td><span style="color:#4fc3f7">● </span>&lt; 15 °C</td>
-              <td style="color:#4fc3f7">Geen risico</td>
-              <td>Normaal trainen en wedstrijden. Blijf hydrateren.</td>
+            <tr class="hk-row" data-max="18">
+              <td><span style="color:#4fc3f7">● </span>&lt; 18 °C</td>
+              <td style="color:#4fc3f7">Laag</td>
+              <td>Er kan gewoon getraind worden. Zorg gedurende de dag voor voldoende vochtinname.</td>
             </tr>
-            <tr class="hk-row" data-min="15" data-max="18">
-              <td><span style="color:#29b6f6">● </span>15 – 18 °C</td>
-              <td style="color:#29b6f6">Laag</td>
-              <td>Normaal. Extra drinken aanbevolen (0,5L/uur).</td>
+            <tr class="hk-row" data-min="18" data-max="21">
+              <td><span style="color:#29b6f6">● </span>18 – 21 °C</td>
+              <td style="color:#29b6f6">Middelmatig</td>
+              <td>Bij lange afstanden kunnen warmteaandoeningen optreden. Wees voorzichtig met overgemotiveerde sporters. Zorg voor voldoende (drink)pauzes tijdens de training.</td>
             </tr>
-            <tr class="hk-row" data-min="18" data-max="23">
-              <td><span style="color:#66bb6a">● </span>18 – 23 °C</td>
-              <td style="color:#66bb6a">Matig</td>
-              <td>Verhoog rustpauzes. Goed hydrateren. Let op signalen van oververhitting.</td>
-            </tr>
-            <tr class="hk-row" data-min="23" data-max="25">
-              <td><span style="color:#ffd166">● </span>23 – 25 °C</td>
+            <tr class="hk-row" data-min="21" data-max="26">
+              <td><span style="color:#ffd166">● </span>21 – 26 °C</td>
               <td style="color:#ffd166">Hoog</td>
-              <td>Atletiekunie: verhoogd risico. Extra koelmaatregelen, langere starts spreiden. Kwetsbare lopers adviseren te stoppen.</td>
+              <td>Wees extra waakzaam op verschijnselen van oververhitting. Beperk de intensiteit en duur van de training. Las iedere 20 minuten een drinkpauze (in de schaduw) in.</td>
             </tr>
-            <tr class="hk-row" data-min="25" data-max="28">
-              <td><span style="color:#ffa726">● </span>25 – 28 °C</td>
+            <tr class="hk-row" data-min="26" data-max="28">
+              <td><span style="color:#ffa726">● </span>26 – 28 °C</td>
               <td style="color:#ffa726">Zeer hoog</td>
-              <td>Atletiekunie: overleg met Veiligheidsregio. Overweeg aanpassing (kortere afstand, tijdsverschuiving) of afgelasting.</td>
+              <td><strong>Wegcoördinator beslist.</strong> Training nog mogelijk met aanpassingen: in ochtend/avond lopen, training inkorten, lichte ademende kleding, meer pauzes, drinken meenemen, lopen in schaduw/bos, hoofd en nek beschermen.</td>
             </tr>
             <tr class="hk-row" data-min="28">
               <td><span style="color:#ef5350">● </span>&gt; 28 °C</td>
               <td style="color:#ef5350">Extreem</td>
-              <td>ACSM / Atletiekunie: sterk afraden. Wedstrijden afgelasten of deelname vrijwillig. Acuut levensgevaar bij hitteberoerte.</td>
+              <td><strong>Wegcoördinator gelast de training af.</strong> Het wordt sterk afgeraden onder deze omstandigheden te gaan sporten. Stel de training uit naar een ander tijdstip of gelast de training af.</td>
             </tr>
           </tbody>
         </table>
         <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;">
-          Bron: Atletiekunie (mei 2026) · ACSM Expert Consensus Statement on Exertional Heat Illness (2023)
+          Bron: SPADO Bergen op Zoom — Beleid "Lopen bij extreme Hitte" · Atletiekunie · ACSM (2023)
         </div>
       </div>
     </div>
@@ -690,12 +685,16 @@ function setTab(tab) {
 function updateAdvies(wbgt) {
   // Duurlopen advies
   const duurNiveaus = [
-    { max: 15,  kleur: "#4fc3f7", icon: "✅", titel: "Geen risico",  tekst: "Normaal trainen en wedstrijden. Blijf goed hydrateren." },
-    { max: 18,  kleur: "#29b6f6", icon: "✅", titel: "Laag risico",  tekst: "Normaal. Drinken elke 15-20 minuten aanbevolen (0,5L/uur)." },
-    { max: 23,  kleur: "#66bb6a", icon: "⚠️", titel: "Matig risico", tekst: "Verhoog rustpauzes. Goed hydrateren. Let op signalen van oververhitting bij deelnemers." },
-    { max: 25,  kleur: "#ffd166", icon: "⚠️", titel: "Hoog risico — extra maatregelen",  tekst: "Atletiekunie: verhoogd risico. Extra koelmaatregelen, langere starts spreiden. Kwetsbare lopers adviseren te stoppen." },
-    { max: 28,  kleur: "#ffa726", icon: "🚨", titel: "Zeer hoog risico — overleg Veiligheidsregio", tekst: "Atletiekunie: overleg met Veiligheidsregio verplicht. Overweeg aanpassing (kortere afstand, tijdsverschuiving) of volledige afgelasting." },
-    { max: 999, kleur: "#ef5350", icon: "🛑", titel: "Extreem — afgelasten", tekst: "ACSM / Atletiekunie: sterk afraden. Wedstrijden afgelasten of deelname vrijwillig maken. Acuut gevaar voor hitteberoerte." },
+    { max: 18,  kleur: "#4fc3f7", icon: "✅", titel: "Laag — normaal trainen",
+      tekst: "Er kan gewoon getraind worden. Zorg gedurende de dag voor voldoende vochtinname." },
+    { max: 21,  kleur: "#29b6f6", icon: "ℹ️", titel: "Middelmatig — let op kwetsbare sporters",
+      tekst: "Bij lange afstanden kunnen warmteaandoeningen optreden. Wees voorzichtig met overgemotiveerde sporters. Zorg voor voldoende (drink)pauzes tijdens de training." },
+    { max: 26,  kleur: "#ffd166", icon: "⚠️", titel: "Hoog — intensiteit en duur beperken",
+      tekst: "Wees extra waakzaam op verschijnselen van oververhitting. Beperk de intensiteit en duur van de training. Las iedere 20 minuten een drinkpauze in de schaduw in." },
+    { max: 28,  kleur: "#ffa726", icon: "🚨", titel: "Zeer hoog — Wegcoördinator beslist",
+      tekst: "Training nog mogelijk met aanpassingen: in ochtend/avond lopen · training inkorten · lichte ademende kleding · meer pauzes · drinken meenemen · lopen in schaduw/bos · hoofd en nek beschermen." },
+    { max: 999, kleur: "#ef5350", icon: "🛑", titel: "Extreem — Wegcoördinator gelast af",
+      tekst: "Het wordt sterk afgeraden onder deze omstandigheden te gaan sporten. Stel de training uit naar een ander tijdstip of gelast de training af." },
   ];
 
   const baanNiveaus = [
