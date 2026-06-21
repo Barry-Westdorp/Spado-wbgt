@@ -564,7 +564,7 @@
 
   <!-- Atletiek Advies Tabs -->
   <div class="card scale-full" id="advies-card">
-    <div class="card-header">▸ ATLETIEK ADVIES — gebaseerd op actuele WBGT</div>
+    <div class="card-header">▸ ATLETIEK ADVIES — gebaseerd op actuele index</div>
 
     <div style="padding: 16px 20px 0;">
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -591,41 +591,82 @@
         <table class="advies-tabel">
           <thead>
             <tr>
+              <th style="width:20px;"></th>
               <th>WBGT</th>
               <th>Niveau</th>
-              <th>Advies Atletiekunie / ACSM</th>
+              <th>Advies SPADO / KNAU / ACSM</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="hk-row" data-max="18">
-              <td><span style="color:#4fc3f7">● </span>&lt; 18 °C</td>
-              <td style="color:#4fc3f7">Laag</td>
-              <td>Er kan gewoon getraind worden. Zorg gedurende de dag voor voldoende vochtinname.</td>
+          <tbody id="tabel-duur-wbgt">
+            <tr class="hk-row" data-min="0" data-max="10">
+              <td><div style="width:12px;height:18px;background:#fff;border:1.5px solid #666;border-radius:2px;"></div></td>
+              <td>&lt; 10 °C</td>
+              <td style="color:#aaa;">Koud</td>
+              <td>Let op onderkoeling. Opwarmen verplicht.</td>
             </tr>
-            <tr class="hk-row" data-min="18" data-max="21">
-              <td><span style="color:#29b6f6">● </span>18 – 21 °C</td>
-              <td style="color:#29b6f6">Middelmatig</td>
-              <td>Bij lange afstanden kunnen warmteaandoeningen optreden. Wees voorzichtig met overgemotiveerde sporters. Zorg voor voldoende (drink)pauzes tijdens de training.</td>
+            <tr class="hk-row" data-min="10" data-max="18">
+              <td><div style="width:12px;height:18px;background:#2d8a4e;border-radius:2px;"></div></td>
+              <td>10 – 18 °C</td>
+              <td style="color:#2d8a4e;">Ideaal</td>
+              <td>Optimale omstandigheden. Normale vochtinname.</td>
             </tr>
-            <tr class="hk-row" data-min="21" data-max="26">
-              <td><span style="color:#ffd166">● </span>21 – 26 °C</td>
-              <td style="color:#ffd166">Hoog</td>
-              <td>Wees extra waakzaam op verschijnselen van oververhitting. Beperk de intensiteit en duur van de training. Las iedere 20 minuten een drinkpauze (in de schaduw) in.</td>
+            <tr class="hk-row" data-min="18" data-max="23">
+              <td><div style="width:12px;height:18px;background:#e8c840;border-radius:2px;"></div></td>
+              <td>18 – 23 °C</td>
+              <td style="color:#7a6200;">Verhoogd</td>
+              <td>Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw.</td>
             </tr>
-            <tr class="hk-row" data-min="26" data-max="28">
-              <td><span style="color:#ffa726">● </span>26 – 28 °C</td>
-              <td style="color:#ffa726">Zeer hoog</td>
-              <td><strong>Wegcoördinator beslist.</strong> Beperk de duur van de inspanning tot 1 uur en pas het programma aan. Mogelijke aanpassingen: in ochtend/avond lopen · training inkorten · lichte ademende kleding · meer pauzes · drinken meenemen · lopen in schaduw/bos · hoofd en nek beschermen.</td>
+            <tr class="hk-row" data-min="23" data-max="28">
+              <td><div style="width:12px;height:18px;background:#d94f3d;border-radius:2px;"></div></td>
+              <td>23 – 28 °C</td>
+              <td style="color:#d94f3d;">Hoog risico</td>
+              <td>Wegcoördinator beslist. Beperk duur tot 1 uur. Lichte kleding, meer pauzes, drinken meenemen, schaduw/bos.</td>
             </tr>
-            <tr class="hk-row" data-min="28">
-              <td><span style="color:#ef5350">● </span>&gt; 28 °C</td>
-              <td style="color:#ef5350">Extreem</td>
-              <td><strong>Wegcoördinator gelast de training af.</strong> Het wordt sterk afgeraden onder deze omstandigheden te gaan sporten. Stel de training uit naar een ander tijdstip of gelast de training af.</td>
+            <tr class="hk-row" data-min="28" data-max="99">
+              <td><div style="width:12px;height:18px;background:#1a1a1a;border-radius:2px;border:1px solid #666;"></div></td>
+              <td>&gt; 28 °C</td>
+              <td style="color:var(--red);">Afgelasten</td>
+              <td>Wegcoördinator gelast af. KNAU / ACSM: niet lopen onder deze omstandigheden.</td>
+            </tr>
+          </tbody>
+          <tbody id="tabel-duur-noaa" style="display:none;">
+            <tr class="hk-row-noaa" data-min="0" data-max="18">
+              <td><div style="width:12px;height:18px;background:#4fc3f7;border-radius:2px;"></div></td>
+              <td>&lt; 18 °C</td>
+              <td style="color:#4fc3f7;">Laag</td>
+              <td>Normaal trainen. Voldoende drinken gedurende de dag.</td>
+            </tr>
+            <tr class="hk-row-noaa" data-min="18" data-max="21">
+              <td><div style="width:12px;height:18px;background:#29b6f6;border-radius:2px;"></div></td>
+              <td>18 – 21 °C</td>
+              <td style="color:#29b6f6;">Middelmatig</td>
+              <td>Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht.</td>
+            </tr>
+            <tr class="hk-row-noaa" data-min="21" data-max="26">
+              <td><div style="width:12px;height:18px;background:#ffd166;border-radius:2px;"></div></td>
+              <td>21 – 26 °C</td>
+              <td style="color:#c89f00;">Hoog</td>
+              <td>Wees extra waakzaam op oververhitting. Intensiteit beperken. Pauze elke 20 min in schaduw.</td>
+            </tr>
+            <tr class="hk-row-noaa" data-min="26" data-max="28">
+              <td><div style="width:12px;height:18px;background:#ffa726;border-radius:2px;"></div></td>
+              <td>26 – 28 °C</td>
+              <td style="color:#cc6600;">Zeer hoog</td>
+              <td>Wegcoördinator beslist. Beperk duur tot 1 uur en pas programma aan.</td>
+            </tr>
+            <tr class="hk-row-noaa" data-min="28" data-max="99">
+              <td><div style="width:12px;height:18px;background:#d94f3d;border-radius:2px;"></div></td>
+              <td>&gt; 28 °C</td>
+              <td style="color:#d94f3d;">Afgelasten</td>
+              <td>Wegcoördinator gelast af. Sterk afgeraden te gaan sporten.</td>
             </tr>
           </tbody>
         </table>
-        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;">
-          Bron: SPADO Bergen op Zoom — Beleid "Lopen bij extreme Hitte" · Atletiekunie · ACSM (2023)
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;" id="bron-duur-wbgt">
+          Bron: ACSM vlagmethode · KNAU (WBGT &gt; 28°C afgelasten) · SPADO Bergen op Zoom protocol (2025)
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;display:none;" id="bron-duur-noaa">
+          Bron: SPADO Bergen op Zoom — "Lopen bij extreme Hitte" (2025) · NOAA Heat Index
         </div>
       </div>
     </div>
@@ -644,41 +685,76 @@
         <table class="advies-tabel">
           <thead>
             <tr>
+              <th style="width:20px;"></th>
               <th>WBGT</th>
-              <th>Sprint / Horden</th>
-              <th>Springen / Werpen</th>
+              <th>Niveau</th>
+              <th id="baan-col-header">Sprint / Horden / Technisch</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="hk-row" data-max="18">
-              <td><span style="color:#4fc3f7">● </span>&lt; 18 °C</td>
-              <td>Normaal trainen</td>
-              <td>Normaal trainen</td>
+          <tbody id="tabel-baan-wbgt">
+            <tr class="hk-row-baan" data-min="0" data-max="18">
+              <td><div style="width:12px;height:18px;background:#2d8a4e;border-radius:2px;"></div></td>
+              <td>&lt; 18 °C</td>
+              <td style="color:#2d8a4e;">Goed</td>
+              <td>Normaal trainen. Reguliere hydratatie.</td>
             </tr>
-            <tr class="hk-row" data-min="18" data-max="23">
-              <td><span style="color:#66bb6a">● </span>18 – 23 °C</td>
-              <td>Normaal. Extra hydratatie.</td>
-              <td>Geen beperkingen. Schaduw zoeken bij wachten.</td>
+            <tr class="hk-row-baan" data-min="18" data-max="23">
+              <td><div style="width:12px;height:18px;background:#e8c840;border-radius:2px;"></div></td>
+              <td>18 – 23 °C</td>
+              <td style="color:#7a6200;">Matig</td>
+              <td>Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk.</td>
             </tr>
-            <tr class="hk-row" data-min="23" data-max="27">
-              <td><span style="color:#ffd166">● </span>23 – 27 °C</td>
-              <td>Verhoog herstelperiode tussen series. Koelvest/schaduw.</td>
-              <td>Meer rust tussen pogingen. Vermijd lang in zon wachten.</td>
+            <tr class="hk-row-baan" data-min="23" data-max="28">
+              <td><div style="width:12px;height:18px;background:#ef9f27;border-radius:2px;"></div></td>
+              <td>23 – 28 °C</td>
+              <td style="color:#854f0b;">Verhoogd</td>
+              <td>Langere rust tussen series. Schaduw verplicht. Technisch normaal. 800m+ volgt weg-drempels.</td>
             </tr>
-            <tr class="hk-row" data-min="27" data-max="30">
-              <td><span style="color:#ffa726">● </span>27 – 30 °C</td>
-              <td>Beperkt tot essentiële series. Intensieve warming-up vermijden.</td>
-              <td>Rusttijd verdubbelen. Koeling verplicht tussen pogingen. Afbreken bij klachten.</td>
+            <tr class="hk-row-baan" data-min="28" data-max="31">
+              <td><div style="width:12px;height:18px;background:#d94f3d;border-radius:2px;"></div></td>
+              <td>28 – 31 °C</td>
+              <td style="color:#d94f3d;">Hoog risico</td>
+              <td>Beperk series tot essentieel. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten.</td>
             </tr>
-            <tr class="hk-row" data-min="30">
-              <td><span style="color:#ef5350">● </span>&gt; 30 °C</td>
+            <tr class="hk-row-baan" data-min="31" data-max="99">
+              <td><div style="width:12px;height:18px;background:#1a1a1a;border-radius:2px;border:1px solid #666;"></div></td>
+              <td>&gt; 31 °C</td>
+              <td style="color:var(--red);">Afgelasten</td>
+              <td>Alle baanonderdelen afgelasten. NSCA: gevaar voor alle atleten.</td>
+            </tr>
+          </tbody>
+          <tbody id="tabel-baan-noaa" style="display:none;">
+            <tr class="hk-row-baan-noaa" data-min="0" data-max="23">
+              <td><div style="width:12px;height:18px;background:#2d8a4e;border-radius:2px;"></div></td>
+              <td>&lt; 23 °C</td>
+              <td style="color:#2d8a4e;">Goed</td>
+              <td>Normaal trainen voor alle baanonderdelen.</td>
+            </tr>
+            <tr class="hk-row-baan-noaa" data-min="23" data-max="30">
+              <td><div style="width:12px;height:18px;background:#ffd166;border-radius:2px;"></div></td>
+              <td>23 – 30 °C</td>
+              <td style="color:#7a6200;">Matig</td>
+              <td>Langere herstelperiode tussen series. Springen/werpen: meer rust, schaduw bij wachten.</td>
+            </tr>
+            <tr class="hk-row-baan-noaa" data-min="30" data-max="35">
+              <td><div style="width:12px;height:18px;background:#d94f3d;border-radius:2px;"></div></td>
+              <td>30 – 35 °C</td>
+              <td style="color:#d94f3d;">Hoog</td>
+              <td>Beperkt tot essentiële series. Koeling verplicht tussen pogingen.</td>
+            </tr>
+            <tr class="hk-row-baan-noaa" data-min="35" data-max="99">
+              <td><div style="width:12px;height:18px;background:#1a1a1a;border-radius:2px;border:1px solid #666;"></div></td>
+              <td>&gt; 35 °C</td>
+              <td style="color:var(--red);">Afgelasten</td>
               <td>Afgelasten of verplaatsen naar koeler moment.</td>
-              <td>Afgelasten of verplaatsen. Zelfs technische onderdelen vormen risico bij extreme hitte.</td>
             </tr>
           </tbody>
         </table>
-        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;">
-          Bron: ACSM (2023) · eigen interpretatie op basis van inspanningsduur en intensiteit per discipline
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;" id="bron-baan-wbgt">
+          Bron: NSCA Coach 8.1 · ACSM Track &amp; Field guidelines · Midden-lange afstand (800m+) volgt weg-drempels
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;display:none;" id="bron-baan-noaa">
+          Bron: ACSM (2023) · eigen interpretatie op basis van inspanningsduur per discipline
         </div>
       </div>
     </div>
@@ -835,320 +911,104 @@ function setTab(tab) {
   document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
 }
 
-// ── Advies updaten op basis van WBGT ─────────────────────────
-function updateAdvies(wbgt) {
-  // Duurlopen advies
-  const duurNiveaus = [
-    { max: 18,  kleur: "#4fc3f7", icon: "✅", titel: "Laag — normaal trainen",
-      tekst: "Er kan gewoon getraind worden. Zorg gedurende de dag voor voldoende vochtinname." },
-    { max: 21,  kleur: "#29b6f6", icon: "ℹ️", titel: "Middelmatig — let op kwetsbare sporters",
-      tekst: "Bij lange afstanden kunnen warmteaandoeningen optreden. Wees voorzichtig met overgemotiveerde sporters. Zorg voor voldoende (drink)pauzes tijdens de training." },
-    { max: 26,  kleur: "#ffd166", icon: "⚠️", titel: "Hoog — intensiteit en duur beperken",
-      tekst: "Wees extra waakzaam op verschijnselen van oververhitting. Beperk de intensiteit en duur van de training. Las iedere 20 minuten een drinkpauze in de schaduw in." },
-    { max: 28,  kleur: "#ffa726", icon: "🚨", titel: "Zeer hoog — Wegcoördinator beslist",
-      tekst: "Beperk de duur van de inspanning tot 1 uur en pas het programma aan. Aanpassingen: in ochtend/avond lopen · training inkorten · lichte ademende kleding · meer pauzes · drinken meenemen · lopen in schaduw/bos · hoofd en nek beschermen." },
-    { max: 999, kleur: "#ef5350", icon: "🛑", titel: "Extreem — Wegcoördinator gelast af",
-      tekst: "Het wordt sterk afgeraden onder deze omstandigheden te gaan sporten. Stel de training uit naar een ander tijdstip of gelast de training af." },
-  ];
-
-  const baanNiveaus = [
-    { max: 18,  kleur: "#4fc3f7", icon: "✅", titel: "Geen risico",  tekst: "Normaal trainen voor alle baanonderdelen. Reguliere hydratatie volstaat." },
-    { max: 23,  kleur: "#66bb6a", icon: "✅", titel: "Laag risico",  tekst: "Sprint en horden: normaal. Springen/werpen: schaduw zoeken bij wachten. Extra drinken." },
-    { max: 27,  kleur: "#ffd166", icon: "⚠️", titel: "Matig risico — rust verhogen", tekst: "Sprint/horden: langere herstelperiode tussen series. Springen/werpen: meer rust tussen pogingen, vermijd lang in zon wachten." },
-    { max: 30,  kleur: "#ffa726", icon: "🚨", titel: "Hoog risico — beperken", tekst: "Sprint/horden: beperkt tot essentiële series, intensieve warming-up vermijden. Springen/werpen: rusttijd verdubbelen, koeling verplicht tussen pogingen." },
-    { max: 999, kleur: "#ef5350", icon: "🛑", titel: "Extreem — afgelasten of verplaatsen", tekst: "Zelfs technische onderdelen vormen gevaar. Afgelasten of verplaatsen naar koeler moment van de dag." },
-  ];
-
-  function setAdvies(prefix, niveaus) {
-    const niveau = niveaus.find(n => wbgt < n.max);
-    if (!niveau) return;
-    document.getElementById(`advies-${prefix}-icon`).textContent = niveau.icon;
-    document.getElementById(`advies-${prefix}-titel`).textContent = niveau.titel;
-    document.getElementById(`advies-${prefix}-titel`).style.color = niveau.kleur;
-    document.getElementById(`advies-${prefix}-tekst`).textContent = niveau.tekst;
-    document.getElementById(`advies-${prefix}-banner`).style.borderColor = niveau.kleur;
-  }
-
-  setAdvies("duur", duurNiveaus);
-  setAdvies("baan", baanNiveaus);
-
-  // Markeer actieve rij in tabel
-  document.querySelectorAll(".hk-row").forEach(row => {
-    const min = parseFloat(row.dataset.min || 0);
-    const max = parseFloat(row.dataset.max || 999);
-    row.classList.toggle("actief-rij", wbgt >= min && wbgt < max);
-  });
-}
-
-// ── Render schaal ────────────────────────────────────────────────
-function renderScale(activeHK = -1) {
-  const grid = document.getElementById("scale-grid");
-  grid.innerHTML = "";
-  HK_SCALE.forEach(({ hk, min, max, label, color }) => {
-    const el = document.createElement("div");
-    el.className = "scale-item" + (hk === activeHK ? " active" : "");
-    el.style.color = color;
-    const range = hk === 0 ? "< 14 °C" : hk === 10 ? "≥ 32 °C" : `${min}–${max} °C`;
-    el.innerHTML = `
-      <div class="scale-dot" style="background:${color}"></div>
-      <div class="scale-info">
-        <div class="scale-hk">Hittekracht ${hk}</div>
-        <div class="scale-range">${range} · ${label}</div>
-      </div>`;
-    grid.appendChild(el);
-  });
-}
-
-renderScale(); // render meteen zonder actieve
-
-// ── Hittekracht pips ─────────────────────────────────────────────
-function renderPips(activeHK = -1) {
-  const bar = document.getElementById("hk-bar");
-  bar.innerHTML = "";
-  HK_SCALE.forEach(({ hk, color }) => {
-    const pip = document.createElement("div");
-    pip.className = "hk-pip";
-    pip.style.background = hk <= activeHK ? color : "var(--border)";
-    bar.appendChild(pip);
-  });
-}
-
-renderPips();
-
-// ── WBGT berekeningen ────────────────────────────────────────────
-function stullTw(ta, rh) {
-  return (
-    ta * Math.atan(0.151977 * Math.pow(rh + 8.313659, 0.5)) +
-    Math.atan(ta + rh) -
-    Math.atan(rh - 1.676331) +
-    0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh) -
-    4.686035
-  );
-}
-
-function liljegrenTg(ta, Q, FF) {
-  const ff = Math.max(FF, 0.5);
-  return ta + 0.0153 * Math.sqrt(Q) * (1 - 0.066 * Math.sqrt(ff)) / (1 + 0.00036 * Q);
-}
-
-function wbgtBuiten(ta, rh, Q, FF) {
-  const tw = stullTw(ta, rh);
-  const tg = liljegrenTg(ta, Q, FF);
-  return { tw, tg, wbgt: 0.7 * tw + 0.2 * tg + 0.1 * ta };
-}
-
-// ── NOAA Heat Index ────────────────────────────────────────────
-// Gevoelstemperatuur conform SPADO-tabel (Rothfusz-formule)
-// Omrekening via Fahrenheit want formule is in °F
-function berekenHumidex(ta, rh) {
-  const tf = ta * 9/5 + 32;
-  const hi_f = -42.379
-    + 2.04901523  * tf
-    + 10.14333127 * rh
-    - 0.22475541  * tf * rh
-    - 0.00683783  * tf * tf
-    - 0.05481717  * rh * rh
-    + 0.00122874  * tf * tf * rh
-    + 0.00085282  * tf * rh * rh
-    - 0.00000199  * tf * tf * rh * rh;
-  const hi_c = (hi_f - 32) * 5/9;
-  return Math.round(hi_c * 10) / 10;
-}
-
-// Bepaal actieve index op basis van schakelaar
-function actieveIndex(wbgt, humidex) {
-  const modus = document.getElementById("index-keuze")?.value || "wbgt";
-  return modus === "humidex" ? humidex : wbgt;
-}
-
-function wbgtBinnen(ta, rh) {
-  const tw = stullTw(ta, rh);
-  return 0.7 * tw + 0.3 * ta;
-}
-
-function calcHK(wbgt) {
-  for (const level of HK_SCALE) {
-    if (wbgt < level.max) return level.hk;
-  }
-  return 10;
-}
-
-// ── Tijdstip meest recente bestand ──────────────────────────────
-function recentFilename(terugvalMin = 20) {
-  const now = new Date();
-  const utcMs = now.getTime() - now.getTimezoneOffset() * 60000;
-  const utc = new Date(utcMs);
-  const mins = Math.floor(utc.getUTCMinutes() / 10) * 10;
-  utc.setUTCMinutes(mins - terugvalMin, 0, 0);
-  const pad = n => String(n).padStart(2, "0");
-  return (
-    `KMDS__OPER_P___10M_OBS_L2_` +
-    `${utc.getUTCFullYear()}${pad(utc.getUTCMonth()+1)}${pad(utc.getUTCDate())}` +
-    `${pad(utc.getUTCHours())}${pad(utc.getUTCMinutes())}.nc`
-  );
-}
-
-// ── Stel status in ───────────────────────────────────────────────
-function setStatus(msg, type = "") {
-  const bar = document.getElementById("status-bar");
-  bar.textContent = msg;
-  bar.className = type;
-}
-
-// ── Hoofd fetch functie ──────────────────────────────────────────
-async function fetchKNMI() {
-  const btn = document.getElementById("update-btn");
-  btn.disabled = true;
-  btn.classList.add("loading");
-  setStatus("Verbinding maken met KNMI Dataplatform…");
-
-  try {
-    const resp = await fetch(`${WORKER_URL}/wbgt`);
-    const data = await resp.json();
-
-    if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
-
-    verwerkData(data);
-    const bronStr = data.bron || "Weerlive.nl";
-    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · ${bronStr}`, "ok");
-
-    } catch (err) {
-    setStatus(`⚠ Fout: ${err.message}`, "error");
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.classList.remove("loading");
-  }
-}
-
-// ── Vereenvoudigde NetCDF-3 parser ──────────────────────────────
-// NetCDF-3 classic formaat: leest variabele-attributen en data
-// voor het specifieke station.
-function parseNetCDF(buffer, stationNr) {
-  const dv = new DataView(buffer);
-  const dec = new TextDecoder("ascii");
-
-  // Controleer magic: "CDF\x01" of "CDF\x02"
-  const magic = dec.decode(new Uint8Array(buffer, 0, 3));
-  if (magic !== "CDF") {
-    // Probeer alternatieve extractie via patroon-matching
-    return parseNetCDFFallback(buffer, stationNr);
-  }
-
-  return parseNetCDFFallback(buffer, stationNr);
-}
-
-// Fallback: zoek bekende byte-patronen voor stationsdata
-function parseNetCDFFallback(buffer, stationNr) {
-  // We gebruiken de Python-script benadering: lees ruwe float32 arrays
-  // en zoek stationsnummer. In het KNMI-bestand staat station als int16 of int32.
-  const u8 = new Uint8Array(buffer);
-
-  // Zoek stationsnummer als big-endian int16 (6340 = 0x18C4)
-  const hi = (stationNr >> 8) & 0xFF;
-  const lo = stationNr & 0xFF;
-
-  let stationIdx = -1;
-  let stationOffset = -1;
-
-  for (let i = 0; i < u8.length - 1; i++) {
-    if (u8[i] === hi && u8[i+1] === lo) {
-      stationIdx++;
-      if (stationOffset === -1) stationOffset = i;
-    }
-  }
-
-  // Als station niet gevonden, geef null terug
-  if (stationIdx < 0) return null;
-
-  // Tijdstip uit bestandsnaam kan niet hier bepaald worden,
-  // maar de JavaScript haalt het al uit de filename
-  return {
-    ta: null, rh: null, ff: null, q: null, fdir: null,
-    tijdstip: "zie bestandsnaam",
-    _raw: true
-  };
-}
-
-// ── Data verwerken en weergeven ──────────────────────────────────
-// Omdat NetCDF-parsing in de browser complex is, gebruiken we
-// een alternatieve aanpak: de worker leest de NetCDF server-side
-// en stuurt JSON terug.
-async function fetchKNMIViaWorker() {
-  // Uitgebreide versie: worker doet NetCDF parsing
-  // Dit vereist een uitgebreidere worker (zie README)
-}
-
-function verwerkData(data) {
-  const { ta, rh, ff, q, fdir } = data;
-
-  const set = (id, val, dec=1) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = val != null ? val.toFixed(dec) : "—";
-    el.classList.remove("fresh"); void el.offsetWidth; el.classList.add("fresh");
-  };
-
-  set("v-ta", ta); set("v-rh", rh, 0); set("v-ff", ff);
-  set("v-q", q, 0); set("v-fdir", fdir, 0);
-
-  if (ta == null || rh == null || ff == null || q == null) return;
-
-  const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
-  const wbgt_in = wbgtBinnen(ta, rh);
-  const hk = calcHK(wbgt);
-  const hkLevel = HK_SCALE[hk];
-
-  // Humidex
-  const humidex = berekenHumidex(ta, rh);
-  const humidexRisico = humidex < 20 ? "Geen ongemak" :
-                        humidex < 25 ? "Licht ongemak" :
-                        humidex < 30 ? "Merkbaar ongemak" :
-                        humidex < 35 ? "Aanzienlijk ongemak" :
-                        humidex < 40 ? "Groot ongemak" :
-                        humidex < 45 ? "Gevaarlijk" : "Hitteberoerte mogelijk";
-  const humidexKleur = humidex < 25 ? "var(--green)" : humidex < 35 ? "var(--yellow)" :
-                       humidex < 40 ? "var(--orange)" : "var(--red)";
-
-  set("c-tw", tw); set("c-tg", tg); set("c-wbgt", wbgt);
-  set("c-wbgt-in", wbgt_in); set("c-hk", hk, 0); set("c-humidex", humidex);
-
-  const risicoEl = document.getElementById("c-humidex-risico");
-  if (risicoEl) { risicoEl.textContent = humidexRisico; risicoEl.style.color = humidexKleur; }
-
-  // Hero WBGT
-  const heroWbgt = document.getElementById("wbgt-out");
-  heroWbgt.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit"> °C</span>`;
-  heroWbgt.style.color = hkLevel.color;
-  heroWbgt.classList.remove("fresh"); void heroWbgt.offsetWidth; heroWbgt.classList.add("fresh");
-
-  // Hero Humidex
-  const heroHx = document.getElementById("humidex-out");
-  if (heroHx) {
-    heroHx.innerHTML = `${humidex.toFixed(1)}<span class="wbgt-unit"> °C</span>`;
-    heroHx.style.color = humidexKleur;
-    heroHx.classList.remove("fresh"); void heroHx.offsetWidth; heroHx.classList.add("fresh");
-  }
-
-  // Meettijd
-  const nu10 = new Date();
-  nu10.setSeconds(0, 0);
-  nu10.setMinutes(Math.floor(nu10.getMinutes() / 10) * 10);
-  const meetStr = nu10.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
-  document.getElementById("wbgt-time").textContent =
-    `WBGT ${wbgt.toFixed(1)} · Humidex ${humidex.toFixed(1)} · Meting ca. ${meetStr}`;
-
-  // Hittekracht
-  document.getElementById("hk-num").textContent = hk;
-  document.getElementById("hk-num").style.color = hkLevel.color;
-  document.getElementById("hk-risk").textContent = hkLevel.label;
-  document.getElementById("hk-risk").style.color = hkLevel.color;
-  renderPips(hk); renderScale(hk);
-
-  // Advies op basis van gekozen index
+// ── Advies updaten op basis van index en switch ──────────────
+function updateAdvies(indexWaarde) {
   const keuze = document.getElementById("index-keuze")?.value || "wbgt";
-  const indexWaarde = keuze === "humidex" ? humidex : wbgt;
-  updateAdvies(indexWaarde);
+  const isNoaa = keuze === "humidex";
+
+  // Schakel juiste tabel-tbody zichtbaar
+  const tonen = (id, zichtbaar) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = zichtbaar ? "" : "none";
+  };
+
+  tonen("tabel-duur-wbgt",  !isNoaa);
+  tonen("tabel-duur-noaa",   isNoaa);
+  tonen("tabel-baan-wbgt",  !isNoaa);
+  tonen("tabel-baan-noaa",   isNoaa);
+  tonen("bron-duur-wbgt",   !isNoaa);
+  tonen("bron-duur-noaa",    isNoaa);
+  tonen("bron-baan-wbgt",   !isNoaa);
+  tonen("bron-baan-noaa",    isNoaa);
+
+  // Actieve rijen markeren
+  const markeerRijen = (selectorClass, waarde) => {
+    document.querySelectorAll("." + selectorClass).forEach(row => {
+      const min = parseFloat(row.dataset.min ?? 0);
+      const max = parseFloat(row.dataset.max ?? 999);
+      row.classList.toggle("actief-rij", waarde >= min && waarde < max);
+    });
+  };
+
+  if (isNoaa) {
+    markeerRijen("hk-row-noaa",      indexWaarde);
+    markeerRijen("hk-row-baan-noaa", indexWaarde);
+  } else {
+    markeerRijen("hk-row",      indexWaarde);
+    markeerRijen("hk-row-baan", indexWaarde);
+  }
+
+  // Banner niveaus per tab
+  const duurNiveaus = isNoaa ? [
+    { max:18,  kleur:"#4fc3f7", icon:"✅", titel:"Laag — normaal trainen",
+      tekst:"Normaal trainen. Voldoende drinken gedurende de dag." },
+    { max:21,  kleur:"#29b6f6", icon:"ℹ️", titel:"Middelmatig — let op kwetsbare sporters",
+      tekst:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
+    { max:26,  kleur:"#ffd166", icon:"⚠️", titel:"Hoog — intensiteit beperken",
+      tekst:"Wees extra waakzaam op oververhitting. Beperk intensiteit. Pauze elke 20 min in schaduw." },
+    { max:28,  kleur:"#ffa726", icon:"🚨", titel:"Zeer hoog — Wegcoördinator beslist",
+      tekst:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen, inkorten, schaduw, meer pauzes." },
+    { max:999, kleur:"#ef5350", icon:"🛑", titel:"Afgelasten — Wegcoördinator gelast af",
+      tekst:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten." },
+  ] : [
+    { max:10,  kleur:"#90caf9", icon:"❄️", titel:"Koud — let op onderkoeling",
+      tekst:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
+    { max:18,  kleur:"#2d8a4e", icon:"✅", titel:"Ideaal — optimale omstandigheden",
+      tekst:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
+    { max:23,  kleur:"#e8c840", icon:"ℹ️", titel:"Verhoogd risico — extra maatregelen",
+      tekst:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
+    { max:28,  kleur:"#d94f3d", icon:"🚨", titel:"Hoog risico — Wegcoördinator beslist",
+      tekst:"Beperk duur tot 1 uur. Aanpassingen verplicht: lichte kleding, meer pauzes, schaduw/bos." },
+    { max:999, kleur:"#b71c1c", icon:"🛑", titel:"Afgelasten — KNAU / ACSM zwarte vlag",
+      tekst:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
+  ];
+
+  const baanNiveaus = isNoaa ? [
+    { max:23,  kleur:"#2d8a4e", icon:"✅", titel:"Goed — normaal trainen",
+      tekst:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+    { max:30,  kleur:"#ffd166", icon:"ℹ️", titel:"Matig — herstel verhogen",
+      tekst:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen meer rustpauzes." },
+    { max:35,  kleur:"#d94f3d", icon:"🚨", titel:"Hoog — essentieel beperken",
+      tekst:"Beperkt tot essentiële series. Koeling verplicht tussen pogingen. Afbreken bij klachten." },
+    { max:999, kleur:"#b71c1c", icon:"🛑", titel:"Afgelasten — verplaatsen",
+      tekst:"Afgelasten of verplaatsen naar koeler moment van de dag." },
+  ] : [
+    { max:18,  kleur:"#2d8a4e", icon:"✅", titel:"Goed — normaal trainen",
+      tekst:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+    { max:23,  kleur:"#e8c840", icon:"ℹ️", titel:"Matig — extra drinken",
+      tekst:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
+    { max:28,  kleur:"#ef9f27", icon:"⚠️", titel:"Verhoogd — rust verlengen",
+      tekst:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
+    { max:31,  kleur:"#d94f3d", icon:"🚨", titel:"Hoog risico — essentieel beperken",
+      tekst:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
+    { max:999, kleur:"#b71c1c", icon:"🛑", titel:"Afgelasten — NSCA zwarte vlag",
+      tekst:"Alle baanonderdelen afgelasten. NSCA: gevaar voor alle atleten." },
+  ];
+
+  function setBanner(prefix, niveaus, waarde) {
+    const n = niveaus.find(x => waarde < x.max) || niveaus[niveaus.length-1];
+    const icon  = document.getElementById(`advies-${prefix}-icon`);
+    const titel = document.getElementById(`advies-${prefix}-titel`);
+    const tekst = document.getElementById(`advies-${prefix}-tekst`);
+    const banner= document.getElementById(`advies-${prefix}-banner`);
+    if (icon)   icon.textContent   = n.icon;
+    if (titel)  { titel.textContent = n.titel; titel.style.color = n.kleur; }
+    if (tekst)  tekst.textContent  = n.tekst;
+    if (banner) banner.style.borderColor = n.kleur;
+  }
+
+  setBanner("duur", duurNiveaus, indexWaarde);
+  setBanner("baan", baanNiveaus, indexWaarde);
 }
 
 
