@@ -945,6 +945,58 @@ function humidexNiveau(hx) {
   return HUMIDEX_SCALE[HUMIDEX_SCALE.length - 1];
 }
 
+// ── Advies-/SPADO-schalen ──────────────────────────────────────────
+// Eén bron voor de adviesbanners ÉN voor de hero-kleur bovenaan.
+// Per discipline (duur/baan) en per index (wbgt/noaa) eigen clusters.
+// max = bovengrens (exclusief). k = kleur.
+const ADVIES = {
+  duur: {
+    wbgt: [
+      { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          kort:"Koud",        tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
+      { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     kort:"Ideaal",      tx:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
+      { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         kort:"Verhoogd",    tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
+      { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", kort:"Hoog risico", tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", kort:"Afgelasten",  tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
+    ],
+    noaa: [
+      { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",                  kort:"Laag",        tx:"Normaal trainen. Voldoende drinken gedurende de dag." },
+      { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", kort:"Middelmatig", tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
+      { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",             kort:"Hoog",        tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw." },
+      { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",       kort:"Zeer hoog",   tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
+      { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",   kort:"Afgelasten",  tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten." },
+    ],
+  },
+  baan: {
+    wbgt: [
+      { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+      { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 kort:"Matig",       tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
+      { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             kort:"Verhoogd",    tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
+      { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     kort:"Hoog risico", tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         kort:"Afgelasten",  tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten." },
+    ],
+    noaa: [
+      { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+      { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              kort:"Matig",       tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes." },
+      { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            kort:"Hoog",        tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten." },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            kort:"Afgelasten",  tx:"Afgelasten of verplaatsen naar koeler moment." },
+    ],
+  },
+};
+
+function actieveDiscipline() {
+  return document.getElementById("tab-baan")?.classList.contains("active") ? "baan" : "duur";
+}
+
+// Kies de juiste adviestabel en het niveau voor een waarde.
+function adviesNiveau(waarde, keuze, discipline) {
+  const idx = keuze === "humidex" ? "noaa" : "wbgt";
+  const tabel = ADVIES[discipline]?.[idx] || ADVIES.duur.wbgt;
+  if (waarde === null || waarde === undefined || Number.isNaN(waarde)) {
+    return { k:"var(--muted)", kort:"—", t:"—", tx:"", i:"" };
+  }
+  return tabel.find(x => waarde < x.max) || tabel[tabel.length - 1];
+}
+
 // Zet een CSS var-string ("var(--red)") om naar de echte hexwaarde,
 // zodat we ook een doorzichtige badge-achtergrond kunnen maken.
 function cssVarNaarHex(kleur) {
@@ -1136,6 +1188,17 @@ function setTab(tab) {
   document.getElementById("panel-baan").style.display = tab === "baan" ? "block" : "none";
   document.getElementById("tab-duur").classList.toggle("active", tab === "duur");
   document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
+
+  // Hero-getallen volgen de actieve discipline: herkleuren
+  const w = window._laatsteWaarden;
+  if (w) {
+    const heroW = document.getElementById("wbgt-out");
+    if (heroW) heroW.style.color = adviesNiveau(w.wbgt, "wbgt", tab).k;
+    const heroH = document.getElementById("humidex-out");
+    if (heroH) heroH.style.color = adviesNiveau(w.humidex, "humidex", tab).k;
+  }
+  // Forecast-tegels en niveaubadge volgen ook de discipline
+  if (window._lastVoorspelling) renderVoorspelling(window._lastVoorspelling);
 }
 
 // ── Advies updaten ────────────────────────────────────────────────
@@ -1156,32 +1219,9 @@ function updateAdvies(indexWaarde) {
   if (isNoaa) { markeer("hk-row-noaa", indexWaarde); markeer("hk-row-baan-noaa", indexWaarde); }
   else        { markeer("hk-row",      indexWaarde); markeer("hk-row-baan",      indexWaarde); }
 
-  const duurN = isNoaa ? [
-    { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",              tx:"Normaal trainen. Voldoende drinken gedurende de dag." },
-    { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
-    { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",         tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw." },
-    { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",   tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
-    { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten." },
-  ] : [
-    { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
-    { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     tx:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
-    { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
-    { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
-    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
-  ];
-
-  const baanN = isNoaa ? [
-    { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-    { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes." },
-    { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten." },
-    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            tx:"Afgelasten of verplaatsen naar koeler moment." },
-  ] : [
-    { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-    { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
-    { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
-    { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
-    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten." },
-  ];
+  const discipline = isNoaa ? "noaa" : "wbgt";
+  const duurN = ADVIES.duur[discipline];
+  const baanN = ADVIES.baan[discipline];
 
   function setBanner(pfx, niveaus, w) {
     const n = niveaus.find(x => w < x.max) || niveaus[niveaus.length-1];
@@ -1299,15 +1339,18 @@ function verwerkData(data) {
   // Hero waarden
   const heroW = document.getElementById("wbgt-out");
   heroW.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit">°C</span>`;
-  heroW.style.color = hkLevel.color;
+  heroW.style.color = adviesNiveau(wbgt, "wbgt", actieveDiscipline()).k;
   heroW.classList.remove("fresh"); void heroW.offsetWidth; heroW.classList.add("fresh");
 
   const heroH = document.getElementById("humidex-out");
   if (heroH) {
     heroH.innerHTML = `${humidex.toFixed(1)}<span class="wbgt-unit">°C</span>`;
-    heroH.style.color = hxKleur;
+    heroH.style.color = adviesNiveau(humidex, "humidex", actieveDiscipline()).k;
     heroH.classList.remove("fresh"); void heroH.offsetWidth; heroH.classList.add("fresh");
   }
+
+  // Bewaar voor herkleuren bij tabwissel
+  window._laatsteWaarden = { wbgt, humidex };
 
   // Meettijd
   const nu10 = new Date();
@@ -1370,9 +1413,9 @@ function renderVoorspelling(uren) {
     const hx_u   = ta_u !== null ? berekenHumidex(ta_u, rh_act) : null;
     const actief_u = keuze === "humidex" ? hx_u : wbgt_u;
 
-    const n = niveauVoor(actief_u, keuze);
-    const kleur = n.kleur;
-    const niveauLabel = n.sport;
+    const n = adviesNiveau(actief_u, keuze, actieveDiscipline());
+    const kleur = n.k;
+    const niveauLabel = n.kort;
 
     const tijdStr  = u.uur || "—";
     const regenStr = regen_u > 0 ? ` · 🌧 ${regen_u}mm` : "";
@@ -1394,14 +1437,15 @@ function renderVoorspelling(uren) {
 function updateNiveauBadge(actief, keuzeOverride) {
   const keuze = keuzeOverride || document.getElementById("index-keuze")?.value || "wbgt";
 
-  const n = niveauVoor(actief, keuze);
+  const n = adviesNiveau(actief, keuze, actieveDiscipline());
+  const badgeBg = n.k && n.k.startsWith("#") ? hexNaarRgba(n.k, 0.15) : "transparent";
 
   // WhatsApp knop badge
   const waBadge = document.getElementById("wa-niveau-badge");
   if (waBadge) {
-    waBadge.textContent = n.label;
-    waBadge.style.color = n.kleur;
-    waBadge.style.background = n.bg;
+    waBadge.textContent = n.kort;
+    waBadge.style.color = n.k;
+    waBadge.style.background = badgeBg;
     waBadge.style.display = "inline-block";
   }
 
