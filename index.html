@@ -128,6 +128,20 @@
   }
 
   @media (max-width: 700px) {
+    main { grid-template-columns: 1fr !important; }
+    .hero-inner { flex-direction: column !important; gap: 14px !important; padding: 16px !important; }
+    [data-size="groot"] { font-size: 2.8rem !important; }
+    [data-size="groot"] .wbgt-unit { font-size: 1.2rem !important; }
+    [data-size="klein"] { font-size: 1.6rem !important; }
+    [data-size="klein"] .wbgt-unit { font-size: 0.9rem !important; }
+    .hk-block { align-items: flex-start !important; }
+    .hk-bar-wrap { flex-wrap: wrap; gap: 3px; max-width: 200px; }
+    .scale-grid { grid-template-columns: 1fr 1fr !important; }
+    .advies-tabel { font-size: 0.78rem; }
+    .advies-tabel td, .advies-tabel th { padding: 6px 8px; }
+    header { padding: 14px 16px; }
+  }
+  @media (max-width: 700px) {
     main { grid-template-columns: 1fr; padding: 16px 12px 0; }
     header { padding: 20px 16px; }
   }
@@ -406,6 +420,30 @@
   [data-size="klein"] { font-size: 1.9rem !important; }
   [data-size="klein"] .wbgt-unit { font-size: 1rem !important; }
 
+  /* ── Forecast ────────────────────────────────────────────── */
+  .fc-uur {
+    padding: 16px 12px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .fc-uur:last-child { border-right: none; }
+  .fc-uur.actief-niveau { background: color-mix(in srgb, currentColor 8%, var(--card)); }
+  .fc-tijd { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+  .fc-wbgt { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+  .fc-unit { font-size: 0.72rem; color: var(--muted); }
+  .fc-ta   { font-size: 0.78rem; color: var(--muted); }
+  .fc-balk { width: 100%; height: 4px; border-radius: 2px; margin-top: 4px; }
+  .fc-niveau { font-size: 0.68rem; font-weight: 700; text-align: center; }
+
+  @media (max-width: 700px) {
+    #forecast-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .fc-uur { border-bottom: 1px solid var(--border); }
+  }
+
   /* ── Skeleton loader ──────────────────────────────────────── */
   .skel {
     background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
@@ -461,6 +499,13 @@
           </div>
         </div>
         <div class="wbgt-sub" id="wbgt-time">Nog geen meting geladen</div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button onclick="stuurWhatsApp()" id="wa-btn" style="background:#25D366;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background 0.2s;flex-shrink:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.116 1.523 5.847L.057 23.882a.5.5 0 0 0 .61.61l6.044-1.47A11.937 11.937 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.508-5.23-1.394l-.374-.216-3.884.944.965-3.792-.235-.389A9.945 9.945 0 0 1 2 12C2 6.478 6.478 2 12 2s10 4.478 10 10-4.478 10-10 10z"/></svg>
+          <span id="wa-btn-tekst">Stuur update</span>
+        </button>
+        <span id="wa-niveau-badge" style="font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:20px;display:none;"></span>
+      </div>
       </div>
 
       <!-- Index schakelaar -->
@@ -488,11 +533,609 @@
           <!-- 11 pips: 0 t/m 10 -->
         </div>
         <div class="hk-risk-label" id="hk-risk">—</div>
+        
       </div>
     </div>
   </div>
 
-  <!-- Meetwaarden -->
+  <!-- Voorspelling komende 6 uur -->
+  <div class="card scale-full" id="forecast-card" style="display:none;">
+    <div class="card-header">▸ <span id="forecast-header-titel">WBGT</span> VOORSPELLING — komende 6 uur</div>
+    <div id="forecast-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:0;">
+      <!-- Gevuld via JavaScript -->
+    </div>
+    <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
+      Straling geschat op basis van bewolking · RH niet beschikbaar in uurverwachting · WBGT is indicatief
+    </div>
+  </div>
+
+  <!-- Schaal -->
+  <div class="card scale-full">
+    <div class="card-header">▸ KNMI Hittekracht schaal (TR-26-04, 2026)</div>
+    <div class="scale-grid" id="scale-grid"></div>
+  </div>
+
+
+  <!-- Eerste hulp bij oververhitting -->
+  <div class="card scale-full">
+    <div class="card-header">▸ EERSTE HULP BIJ OVERVERHITTING — SPADO protocol</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
+
+      <!-- Signalen -->
+      <div style="padding:20px;border-right:1px solid var(--border);">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Signalen</div>
+        <table style="width:100%;border-collapse:collapse;">
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:9px 0;font-size:0.88rem;color:var(--muted);">Misselijkheid / duizeligheid</td>
+              <td style="padding:9px 0;text-align:right;white-space:nowrap;"><span style="color:var(--yellow);font-size:0.78rem;font-weight:700;">⚠ Let op</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:9px 0;font-size:0.88rem;color:var(--muted);">Hevig zweten of droge huid</td>
+              <td style="padding:9px 0;text-align:right;white-space:nowrap;"><span style="color:var(--yellow);font-size:0.78rem;font-weight:700;">⚠ Let op</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:9px 0;font-size:0.88rem;color:var(--muted);">Verwardheid / niet helder</td>
+              <td style="padding:9px 0;text-align:right;white-space:nowrap;"><span style="color:var(--orange);font-size:0.78rem;font-weight:700;">⚠ Actie</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:9px 0;font-size:0.88rem;color:var(--muted);">Buiten bewustzijn</td>
+              <td style="padding:9px 0;text-align:right;white-space:nowrap;"><span style="color:var(--red);font-size:0.78rem;font-weight:700;">🛑 Bel 112</span></td>
+            </tr>
+            <tr>
+              <td style="padding:9px 0;font-size:0.88rem;color:var(--muted);">Niet snel opknappen</td>
+              <td style="padding:9px 0;text-align:right;white-space:nowrap;"><span style="color:var(--red);font-size:0.78rem;font-weight:700;">🛑 Bel 112</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Handelingsprotocol -->
+      <div style="padding:20px;">
+        <div style="font-size:0.72rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">Handelingsprotocol SPADO</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;">
+            <div style="background:var(--accent);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">1</div>
+            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;padding-top:2px;">Leg op <strong style="color:var(--white);">koele plaats</strong>, benen en bekken iets omhoog.</span>
+          </div>
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;">
+            <div style="background:var(--accent);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">2</div>
+            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;padding-top:2px;"><strong style="color:var(--white);">Afkoelen</strong> via ventilatie en indien mogelijk icepacks in nek, oksels of lies.</span>
+          </div>
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;">
+            <div style="background:var(--accent);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">3</div>
+            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;padding-top:2px;">Laat <strong style="color:var(--white);">drinken</strong> indien bij bewustzijn.</span>
+          </div>
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;">
+            <div style="background:var(--red);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;">!</div>
+            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;padding-top:2px;"><strong style="color:var(--red);">Bel 112</strong> als het slachtoffer buiten bewustzijn is of niet snel opknapt.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
+      Bron: SPADO Bergen op Zoom — Protocol "Lopen bij extreem weer" (2025)
+    </div>
+  </div>
+
+
+</main>
+
+
+
+
+<footer>
+  Bron: <a href="https://dataplatform.knmi.nl" target="_blank">KNMI Dataplatform</a> ·
+  Methode: Liljegren (TR-26-04, 2026) · Stull (2011) · ISO 7243:2017 ·
+  Station Woensdrecht 06340
+</footer>
+
+<script>
+// ── Configuratie ─────────────────────────────────────────────────
+const WORKER_URL   = "https://knmi-proxy.barry-f41.workers.dev";
+const STATION_NR   = 6340;
+
+// ── Hittekracht schaal (KNMI TR-26-04) ───────────────────────────
+const HK_SCALE = [
+  { hk:0,  min:-99, max:14,  label:"Geen",            color:"#4fc3f7" },
+  { hk:1,  min:14,  max:16,  label:"Verwaarloosbaar",  color:"#29b6f6" },
+  { hk:2,  min:16,  max:18,  label:"Zeer licht",       color:"#26c6da" },
+  { hk:3,  min:18,  max:20,  label:"Licht",            color:"#26c6da" },
+  { hk:4,  min:20,  max:22,  label:"Matig",            color:"#66bb6a" },
+  { hk:5,  min:22,  max:24,  label:"Verhoogd",         color:"#ffd166" },
+  { hk:6,  min:24,  max:26,  label:"Hoog",             color:"#ffa726" },
+  { hk:7,  min:26,  max:28,  label:"Hoog",             color:"#ff7043" },
+  { hk:8,  min:28,  max:30,  label:"Zeer hoog",        color:"#ef5350" },
+  { hk:9,  min:30,  max:32,  label:"Extreem",          color:"#b71c1c" },
+  { hk:10, min:32,  max:99,  label:"Uitzonderlijk",    color:"#880e0e" },
+];
+
+function calcHK(wbgt) {
+  for (const l of HK_SCALE) { if (wbgt < l.max) return l.hk; }
+  return 10;
+}
+
+// ── Schaal renderen ───────────────────────────────────────────────
+function renderScale(activeHK = -1) {
+  const grid = document.getElementById("scale-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  HK_SCALE.forEach(({ hk, min, max, label, color }) => {
+    const el = document.createElement("div");
+    el.className = "scale-item" + (hk === activeHK ? " active" : "");
+    el.style.color = color;
+    const range = hk === 0 ? "< 14 °C" : hk === 10 ? "≥ 32 °C" : `${min}–${max} °C`;
+    el.innerHTML = `<div class="scale-dot" style="background:${color}"></div>
+      <div class="scale-info">
+        <div class="scale-hk">Hittekracht ${hk}</div>
+        <div class="scale-range">${range} · ${label}</div>
+      </div>`;
+    grid.appendChild(el);
+  });
+}
+
+function renderPips(activeHK = -1) {
+  const bar = document.getElementById("hk-bar");
+  if (!bar) return;
+  bar.innerHTML = "";
+  HK_SCALE.forEach(({ hk, color }) => {
+    const pip = document.createElement("div");
+    pip.className = "hk-pip";
+    pip.style.background = hk <= activeHK ? color : "var(--border)";
+    bar.appendChild(pip);
+  });
+}
+
+renderScale(); renderPips();
+
+// ── WBGT berekening (verbeterde Liljegren 2008) ───────────────────
+// Wind op 10m → 2m via machtswet (Liljegren 2008, stability class C)
+function wind10mNaar2m(ff10) {
+  return ff10 * Math.pow(2/10, 0.2);
+}
+
+// Stull (2011) natteboltemperatuur via Ta en RH
+function stullTw(ta, rh) {
+  return (ta * Math.atan(0.151977 * Math.pow(rh + 8.313659, 0.5))
+    + Math.atan(ta + rh)
+    - Math.atan(rh - 1.676331)
+    + 0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh)
+    - 4.686035);
+}
+
+// Liljegren (2008) zwarteboltemperatuur Tg
+// Verbeterd: wind gecorrigeerd naar 2m, D=0.0508m (standaard bol diameter)
+function liljegrenTg(ta, Q, ff10) {
+  const ff2 = Math.max(wind10mNaar2m(ff10), 0.1);
+  const D = 0.0508; // bol diameter 50.8mm
+  // Stralingsabsorptie en convectie evenwicht
+  const alpha = 0.95; // absorptiecoefficient zwarte bol
+  const epsilon = 0.95;
+  const sigma = 5.67e-8;
+  // Vereenvoudigde iteratieve oplossing (Liljegren analytisch)
+  const Ta_K = ta + 273.15;
+  // Initiële schatting
+  let Tg_K = Ta_K + 0.0153 * Math.sqrt(Q) * (1 - 0.066 * Math.sqrt(ff2)) / (1 + 0.00036 * Q);
+  // 3 iteraties voor betere nauwkeurigheid
+  for (let i = 0; i < 3; i++) {
+    const hg = 1.1 * Math.pow(ff2, 0.6) * Math.pow(D, -0.4); // convectiecoefficient
+    const Tg_K_new = Ta_K + (alpha * Q / (4 * hg) - epsilon * sigma * (Math.pow(Tg_K, 4) - Math.pow(Ta_K, 4)) / hg);
+    Tg_K = Ta_K + (alpha * Q / (4 * (hg + 4 * epsilon * sigma * Math.pow(Tg_K, 3))));
+  }
+  return Math.min(Tg_K - 273.15, ta + 25); // max 25°C boven luchttemp als begrenzing
+}
+
+function wbgtBuiten(ta, rh, Q, ff10) {
+  const tw = stullTw(ta, rh);
+  const tg = liljegrenTg(ta, Q, ff10);
+  const wbgt = 0.7 * tw + 0.2 * tg + 0.1 * ta;
+  return { tw, tg, wbgt };
+}
+
+function wbgtBinnen(ta, rh) {
+  return 0.7 * stullTw(ta, rh) + 0.3 * ta;
+}
+
+// NOAA Heat Index (conform SPADO tabel, Rothfusz)
+function berekenHumidex(ta, rh) {
+  if (ta < 27 || rh < 40) {
+    // Eenvoudigere formule bij lage temp/RH
+    const e = rh / 100 * 6.105 * Math.exp(17.27 * ta / (ta + 237.3));
+    return Math.round((ta + 0.33 * e - 0.70 * 1 - 4.00) * 10) / 10;
+  }
+  const tf = ta * 9/5 + 32;
+  const hi_f = -42.379
+    + 2.04901523  * tf + 10.14333127 * rh
+    - 0.22475541  * tf * rh - 0.00683783 * tf * tf
+    - 0.05481717  * rh * rh + 0.00122874 * tf * tf * rh
+    + 0.00085282  * tf * rh * rh - 0.00000199 * tf * tf * rh * rh;
+  return Math.round((hi_f - 32) * 5/9 * 10) / 10;
+}
+
+// ── Index keuze schakelaar ────────────────────────────────────────
+function setIndexKeuze(keuze) {
+  document.getElementById("index-keuze").value = keuze;
+  const btnW = document.getElementById("btn-wbgt");
+  const btnH = document.getElementById("btn-humidex");
+  const uitleg = document.getElementById("index-uitleg");
+  const elWbgt = document.getElementById("wbgt-out");
+  const elNoaa = document.getElementById("humidex-out");
+
+  const fcTitel = document.getElementById("forecast-header-titel");
+  if (keuze === "wbgt") {
+    btnW.style.background = "var(--accent)"; btnW.style.color = "white";
+    btnH.style.background = "transparent";   btnH.style.color = "var(--muted)";
+    uitleg.textContent = "ISO 7243 · wind + straling";
+    elWbgt.setAttribute("data-size","groot"); elNoaa.setAttribute("data-size","klein");
+    if (fcTitel) fcTitel.textContent = "WBGT";
+  } else {
+    btnH.style.background = "var(--yellow)"; btnH.style.color = "#000";
+    btnW.style.background = "transparent";   btnW.style.color = "var(--muted)";
+    uitleg.textContent = "NOAA Heat Index · conform SPADO tabel";
+    elNoaa.setAttribute("data-size","groot"); elWbgt.setAttribute("data-size","klein");
+    if (fcTitel) fcTitel.textContent = "Gevoelstemp. (NOAA)";
+  }
+
+  // Update tabelkop
+  const kopEl  = document.getElementById("duur-tabel-kop");
+  const bronEl = document.getElementById("duur-tabel-bron-kop");
+  if (kopEl)  kopEl.textContent  = keuze === "humidex" ? "Gevoelstemp. (NOAA)" : "WBGT";
+  if (bronEl) bronEl.textContent = keuze === "humidex" ? "Advies SPADO 2025" : "Advies SPADO / KNAU / ACSM";
+
+  const wbgtVal = parseFloat(document.getElementById("c-wbgt")?.textContent);
+  const noaaVal = parseFloat(document.getElementById("c-humidex")?.textContent);
+  if (!isNaN(wbgtVal) && !isNaN(noaaVal)) {
+    const actief = keuze === "humidex" ? noaaVal : wbgtVal;
+    updateAdvies(actief);
+    updateNiveauBadge(actief, keuze);
+    const hk = calcHK(wbgtVal);
+    const hkLevel = HK_SCALE[hk];
+    document.getElementById("hk-num").textContent = hk;
+    document.getElementById("hk-num").style.color = hkLevel.color;
+    document.getElementById("hk-risk").textContent = hkLevel.label;
+    document.getElementById("hk-risk").style.color = hkLevel.color;
+    renderPips(hk); renderScale(hk);
+  }
+}
+
+// ── Tab switcher ──────────────────────────────────────────────────
+function setTab(tab) {
+  document.getElementById("panel-duur").style.display = tab === "duur" ? "block" : "none";
+  document.getElementById("panel-baan").style.display = tab === "baan" ? "block" : "none";
+  document.getElementById("tab-duur").classList.toggle("active", tab === "duur");
+  document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
+}
+
+// ── Advies updaten ────────────────────────────────────────────────
+function updateAdvies(indexWaarde) {
+  const keuze  = document.getElementById("index-keuze")?.value || "wbgt";
+  const isNoaa = keuze === "humidex";
+
+  const tonen = (id, z) => { const el = document.getElementById(id); if (el) el.style.display = z ? "" : "none"; };
+  tonen("tabel-duur-wbgt", !isNoaa); tonen("tabel-duur-noaa", isNoaa);
+  tonen("tabel-baan-wbgt", !isNoaa); tonen("tabel-baan-noaa", isNoaa);
+  tonen("bron-duur-wbgt",  !isNoaa); tonen("bron-duur-noaa",  isNoaa);
+  tonen("bron-baan-wbgt",  !isNoaa); tonen("bron-baan-noaa",  isNoaa);
+
+  const markeer = (cls, w) => document.querySelectorAll("."+cls).forEach(r => {
+    r.classList.toggle("actief-rij", w >= parseFloat(r.dataset.min??0) && w < parseFloat(r.dataset.max??999));
+  });
+
+  if (isNoaa) { markeer("hk-row-noaa", indexWaarde); markeer("hk-row-baan-noaa", indexWaarde); }
+  else        { markeer("hk-row",      indexWaarde); markeer("hk-row-baan",      indexWaarde); }
+
+  const duurN = isNoaa ? [
+    { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",              tx:"Normaal trainen. Voldoende drinken gedurende de dag." },
+    { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
+    { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",         tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw." },
+    { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",   tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
+    { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten." },
+  ] : [
+    { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
+    { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     tx:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
+    { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
+    { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
+    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
+  ];
+
+  const baanN = isNoaa ? [
+    { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+    { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes." },
+    { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten." },
+    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            tx:"Afgelasten of verplaatsen naar koeler moment." },
+  ] : [
+    { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+    { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
+    { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
+    { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
+    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten." },
+  ];
+
+  function setBanner(pfx, niveaus, w) {
+    const n = niveaus.find(x => w < x.max) || niveaus[niveaus.length-1];
+    const set = (id, v, style) => { const el = document.getElementById(id); if (el) { el.textContent = v; if (style) Object.assign(el.style, style); } };
+    set(`advies-${pfx}-icon`,   n.i);
+    set(`advies-${pfx}-titel`,  n.t,  { color: n.k });
+    set(`advies-${pfx}-tekst`,  n.tx);
+    const banner = document.getElementById(`advies-${pfx}-banner`);
+    if (banner) banner.style.borderColor = n.k;
+  }
+
+  setBanner("duur", duurN, indexWaarde);
+  setBanner("baan", baanN, indexWaarde);
+}
+
+// ── WhatsApp bericht sturen ───────────────────────────────────────
+function stuurWhatsApp() {
+  const keuze   = document.getElementById("index-keuze")?.value || "wbgt";
+  const isNoaa  = keuze === "humidex";
+  const wbgt    = document.getElementById("c-wbgt")?.textContent || "—";
+  const noaa    = document.getElementById("c-humidex")?.textContent || "—";
+  const actief  = isNoaa ? parseFloat(noaa) : parseFloat(wbgt);
+  const waarde  = isNoaa ? noaa : wbgt;
+  const indexNm = isNoaa ? "Gevoelstemp. (NOAA)" : "WBGT";
+  const dagStr  = new Date().toLocaleDateString("nl-NL", { weekday:"long", day:"numeric", month:"long" });
+
+  let tekst;
+
+  if (isNoaa) {
+    // NOAA drempels: <18 Laag, 18-21 Middelmatig, 21-26 Hoog, 26-28 Zeer hoog, >28 Afgelasten
+    if (actief < 18) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C — geen bezwaren voor de training vanavond.\n\n` +
+        `Fijne training!\n— Coördinator wegatletiek SPADO`;
+    } else if (actief < 21) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: middelmatig).\n\n` +
+        `Training gaat door maar let extra op je groep: zorg voor drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else if (actief < 26) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: hoog).\n\n` +
+        `Wees extra waakzaam op oververhitting. Beperk de intensiteit en duur van de training. Drinkpauze elke 20 min in de schaduw.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else if (actief < 28) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: zeer hoog).\n\n` +
+        `Training is aangepast: beperk de duur tot maximaal 1 uur en pas het programma aan. Informeer jullie groepen alstublieft.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else {
+      tekst =
+        `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
+        `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
+    }
+  } else {
+    // WBGT drempels: <18 Ideaal, 18-23 Verhoogd, 23-28 Hoog risico, >28 Afgelasten
+    if (actief < 18) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C — geen bezwaren voor de training vanavond.\n\n` +
+        `Fijne training!\n— Coördinator wegatletiek SPADO`;
+    } else if (actief < 23) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: verhoogd).\n\n` +
+        `Training gaat door maar let extra op je groep: zorg voor drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else if (actief < 28) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: hoog risico).\n\n` +
+        `Training is aangepast: beperk de duur tot maximaal 1 uur, loop bij voorkeur in de schaduw en bouw extra pauzes in. Lichte kleding en voldoende drinken zijn verplicht.\n\n` +
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
+    } else {
+      tekst =
+        `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
+        `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
+    }
+  }
+
+  window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank");
+}
+
+
+// ── Data verwerken ────────────────────────────────────────────────
+function verwerkData(data) {
+  const { ta, rh, ff, q, fdir } = data;
+
+  const set = (id, val, dec=1) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = val != null ? val.toFixed(dec) : "—";
+    el.classList.remove("fresh"); void el.offsetWidth; el.classList.add("fresh");
+  };
+
+  set("v-ta", ta); set("v-rh", rh, 0); set("v-ff", ff);
+  set("v-q",  q, 0); set("v-fdir", fdir, 0);
+
+  if (ta == null || rh == null || ff == null || q == null) return;
+
+  const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
+  const wbgt_in  = wbgtBinnen(ta, rh);
+  const hk       = calcHK(wbgt);
+  const hkLevel  = HK_SCALE[hk];
+  const humidex  = berekenHumidex(ta, rh);
+  const hxKleur  = humidex < 25 ? "var(--green)" : humidex < 35 ? "var(--yellow)" :
+                   humidex < 40 ? "var(--orange)" : "var(--red)";
+  const hxRisico = humidex < 20 ? "Geen ongemak" : humidex < 25 ? "Licht ongemak" :
+                   humidex < 30 ? "Merkbaar ongemak" : humidex < 35 ? "Aanzienlijk ongemak" :
+                   humidex < 40 ? "Groot ongemak" : humidex < 45 ? "Gevaarlijk" : "Hitteberoerte mogelijk";
+
+  set("c-tw", tw); set("c-tg", tg); set("c-wbgt", wbgt);
+  set("c-wbgt-in", wbgt_in); set("c-hk", hk, 0); set("c-humidex", humidex);
+
+  const rEl = document.getElementById("c-humidex-risico");
+  if (rEl) { rEl.textContent = hxRisico; rEl.style.color = hxKleur; }
+
+  // Hero waarden
+  const heroW = document.getElementById("wbgt-out");
+  heroW.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit">°C</span>`;
+  heroW.style.color = hkLevel.color;
+  heroW.classList.remove("fresh"); void heroW.offsetWidth; heroW.classList.add("fresh");
+
+  const heroH = document.getElementById("humidex-out");
+  if (heroH) {
+    heroH.innerHTML = `${humidex.toFixed(1)}<span class="wbgt-unit">°C</span>`;
+    heroH.style.color = hxKleur;
+    heroH.classList.remove("fresh"); void heroH.offsetWidth; heroH.classList.add("fresh");
+  }
+
+  // Meettijd
+  const nu10 = new Date();
+  nu10.setSeconds(0,0); nu10.setMinutes(Math.floor(nu10.getMinutes()/10)*10);
+  const meetStr = nu10.toLocaleTimeString("nl-NL", { hour:"2-digit", minute:"2-digit" });
+  const el_time = document.getElementById("wbgt-time");
+  if (el_time) el_time.textContent = `WBGT ${wbgt.toFixed(1)} · Gevoelstemp. ${humidex.toFixed(1)} · Meting ca. ${meetStr}`;
+
+  // Hittekracht
+  const hkNum  = document.getElementById("hk-num");
+  const hkRisk = document.getElementById("hk-risk");
+  const hkLvl  = document.getElementById("hk-level");
+  if (hkNum)  { hkNum.textContent  = hk;           hkNum.style.color  = hkLevel.color; }
+  if (hkRisk) { hkRisk.textContent = hkLevel.label; hkRisk.style.color = hkLevel.color; }
+  if (hkLvl)  { hkLvl.textContent  = hkLevel.label; hkLvl.style.color  = hkLevel.color; }
+
+  renderPips(hk); renderScale(hk);
+
+  // Advies op basis van gekozen index
+  const keuze = document.getElementById("index-keuze")?.value || "wbgt";
+  const actief = keuze === "humidex" ? humidex : wbgt;
+  updateAdvies(actief);
+  updateNiveauBadge(actief);
+
+  // Voorspelling renderen
+  if (data.voorspelling && data.voorspelling.length > 0) {
+    renderVoorspelling(data.voorspelling);
+    const fcTitel2 = document.getElementById("forecast-header-titel");
+    const keuze2 = document.getElementById("index-keuze")?.value || "wbgt";
+    if (fcTitel2) fcTitel2.textContent = keuze2 === "humidex" ? "Gevoelstemp. (NOAA)" : "WBGT";
+  }
+}
+
+// ── Voorspelling renderen ─────────────────────────────────────────
+function renderVoorspelling(uren) {
+  const card = document.getElementById("forecast-card");
+  const grid = document.getElementById("forecast-grid");
+  if (!card || !grid) return;
+
+  card.style.display = "block";
+  grid.innerHTML = "";
+
+  // Bepaal actieve keuze voor kleur
+  const keuze = document.getElementById("index-keuze")?.value || "wbgt";
+
+  uren.forEach(u => {
+    const ta_u   = u.ta;
+    const ff_u   = Math.max(u.ff || 1, 0.5);
+    const q_u    = u.q || 0;
+    const regen_u= u.neerslag || 0;
+
+    const rh_act = parseFloat(document.getElementById("v-rh")?.textContent) || 60;
+    const tw_u   = stullTw(ta_u || 20, rh_act);
+    const tg_u   = liljegrenTg(ta_u || 20, q_u, ff_u);
+    const wbgt_u = ta_u !== null ? Math.round((0.7*tw_u + 0.2*tg_u + 0.1*ta_u) * 10) / 10 : null;
+    const hx_u   = ta_u !== null ? berekenHumidex(ta_u, rh_act) : null;
+    const actief_u = keuze === "humidex" ? hx_u : wbgt_u;
+
+    const kleur = actief_u === null ? "var(--muted)" :
+      actief_u < 18 ? "#2d8a4e" :
+      actief_u < 23 ? "#e8c840" :
+      actief_u < 28 ? "#d94f3d" : "#b71c1c";
+
+    const niveauLabel = actief_u === null ? "—" :
+      actief_u < 18 ? (keuze === "humidex" ? "Laag" : "Ideaal") :
+      actief_u < 23 ? "Verhoogd" :
+      actief_u < 28 ? "Hoog risico" : "Afgelasten";
+
+    const tijdStr = u.uur ? u.uur.slice(-5) : "—";
+    const regenStr = regen_u > 0 ? ` · 🌧 ${regen_u}mm` : "";
+
+    const el = document.createElement("div");
+    el.className = "fc-uur";
+    el.innerHTML = `
+      <div class="fc-tijd">${tijdStr}</div>
+      <div class="fc-wbgt" style="color:${kleur};">${wbgt_u !== null ? wbgt_u.toFixed(1) : "—"}<span class="fc-unit">°C</span></div>
+      <div class="fc-ta">${ta_u !== null ? ta_u.toFixed(1)+"°C" : "—"}${regenStr}</div>
+      <div class="fc-balk" style="background:${kleur};opacity:0.5;"></div>
+      <div class="fc-niveau" style="color:${kleur};">${niveauLabel}</div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function updateNiveauBadge(actief, keuzeOverride) {
+  const keuze  = keuzeOverride || document.getElementById("index-keuze")?.value || "wbgt";
+  const isNoaa = keuze === "humidex";
+
+  const niveaus = isNoaa ? [
+    { max:18,  label:"Laag",        kleur:"#4fc3f7", bg:"rgba(79,195,247,0.15)" },
+    { max:21,  label:"Middelmatig", kleur:"#29b6f6", bg:"rgba(41,182,246,0.15)" },
+    { max:26,  label:"Hoog",        kleur:"#ffd166", bg:"rgba(255,209,102,0.15)"},
+    { max:28,  label:"Zeer hoog",   kleur:"#ffa726", bg:"rgba(255,167,38,0.15)" },
+    { max:999, label:"Afgelasten",  kleur:"#ef5350", bg:"rgba(239,83,80,0.15)"  },
+  ] : [
+    { max:10,  label:"Koud",        kleur:"#90caf9", bg:"rgba(144,202,249,0.15)"},
+    { max:18,  label:"Ideaal",      kleur:"#2d8a4e", bg:"rgba(45,138,78,0.15)"  },
+    { max:23,  label:"Verhoogd",    kleur:"#e8c840", bg:"rgba(232,200,64,0.15)" },
+    { max:28,  label:"Hoog risico", kleur:"#d94f3d", bg:"rgba(217,79,61,0.15)"  },
+    { max:999, label:"Afgelasten",  kleur:"#b71c1c", bg:"rgba(183,28,28,0.15)"  },
+  ];
+
+  const n = niveaus.find(x => actief < x.max) || niveaus[niveaus.length-1];
+
+  // WhatsApp knop badge
+  const waBadge = document.getElementById("wa-niveau-badge");
+  if (waBadge) {
+    waBadge.textContent = n.label;
+    waBadge.style.color = n.kleur;
+    waBadge.style.background = n.bg;
+    waBadge.style.display = "inline-block";
+  }
+
+  // Knoptekst aanpassen
+  const btnTekst = document.getElementById("wa-btn-tekst");
+  if (btnTekst) {
+    btnTekst.textContent = actief >= 28 ? "Stuur afgelasting" :
+                           actief >= 23 ? "Stuur aanpassing" :
+                           actief >= 18 ? "Stuur waarschuwing" : "Stuur update";
+  }
+}
+
+// ── KNMI data ophalen ─────────────────────────────────────────────
+async function fetchKNMI() {
+  const btn = document.getElementById("update-btn");
+  btn.disabled = true; btn.classList.add("loading");
+  setStatus("Data ophalen van Weerlive · Woensdrecht…");
+  try {
+    const resp = await fetch(`${WORKER_URL}/wbgt`);
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
+    verwerkData(data);
+    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · ${data.bron || "Weerlive.nl · KNMI-data"}`, "ok");
+  } catch (err) {
+    setStatus(`⚠ Fout: ${err.message}`, "error");
+    console.error(err);
+  } finally {
+    btn.disabled = false; btn.classList.remove("loading");
+  }
+}
+
+function setStatus(msg, type="") {
+  const bar = document.getElementById("status-bar");
+  if (bar) { bar.textContent = msg; bar.className = type; }
+}
+
+// ── Auto-load ─────────────────────────────────────────────────────
+window.addEventListener("load", () => {
+  fetchKNMI();
+  setInterval(fetchKNMI, 10 * 60 * 1000);
+});
+</script>
+
+</body>
+</html>
+
+    <!-- Meetwaarden -->
   <div class="card">
     <div class="card-header">▸ Meetwaarden Woensdrecht</div>
     <div class="card-body">
@@ -592,9 +1235,9 @@
           <thead>
             <tr>
               <th style="width:20px;"></th>
-              <th>WBGT</th>
+              <th id="duur-tabel-kop">WBGT</th>
               <th>Niveau</th>
-              <th>Advies SPADO / KNAU / ACSM</th>
+              <th id="duur-tabel-bron-kop">Advies SPADO / KNAU / ACSM</th>
             </tr>
           </thead>
           <tbody id="tabel-duur-wbgt">
@@ -759,426 +1402,3 @@
       </div>
     </div>
   </div>
-
-  <!-- Schaal -->
-  <div class="card scale-full">
-    <div class="card-header">▸ KNMI Hittekracht schaal (TR-26-04, 2026)</div>
-    <div class="scale-grid" id="scale-grid"></div>
-  </div>
-
-</main>
-
-
-  <!-- Eerste hulp bij oververhitting -->
-  <div class="card scale-full">
-    <div class="card-header">▸ EERSTE HULP BIJ OVERVERHITTING — SPADO protocol</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:20px;">
-
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">Signalen oververhitting</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="data-row" style="border-color:var(--border)">
-            <span style="color:var(--muted);font-size:0.9rem;">Misselijkheid / duizeligheid</span>
-            <span style="color:var(--yellow);font-weight:700;font-size:0.85rem;">⚠️ Let op</span>
-          </div>
-          <div class="data-row" style="border-color:var(--border)">
-            <span style="color:var(--muted);font-size:0.9rem;">Hevig zweten of juist droge huid</span>
-            <span style="color:var(--yellow);font-weight:700;font-size:0.85rem;">⚠️ Let op</span>
-          </div>
-          <div class="data-row" style="border-color:var(--border)">
-            <span style="color:var(--muted);font-size:0.9rem;">Verwardheid / niet helder</span>
-            <span style="color:var(--orange);font-weight:700;font-size:0.85rem;">🚨 Actie</span>
-          </div>
-          <div class="data-row" style="border-color:var(--border)">
-            <span style="color:var(--muted);font-size:0.9rem;">Buiten bewustzijn</span>
-            <span style="color:var(--red);font-weight:700;font-size:0.85rem;">🛑 112 bellen</span>
-          </div>
-          <div class="data-row" style="border-bottom:none">
-            <span style="color:var(--muted);font-size:0.9rem;">Niet snel opknappen</span>
-            <span style="color:var(--red);font-weight:700;font-size:0.85rem;">🛑 112 bellen</span>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">Handelingsprotocol SPADO</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <span style="background:var(--accent);color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">1</span>
-            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Leg het slachtoffer op een <strong style="color:var(--white)">koele plaats</strong>, benen en bekken iets omhoog.</span>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <span style="background:var(--accent);color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">2</span>
-            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Zorg voor <strong style="color:var(--white)">afkoeling</strong> door ventilatie en indien mogelijk icepacks in nek, oksels of lies.</span>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <span style="background:var(--accent);color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">3</span>
-            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Laat het slachtoffer <strong style="color:var(--white)">drinken</strong> indien bij bewustzijn.</span>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <span style="background:var(--red);color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">!</span>
-            <span style="font-size:0.88rem;color:var(--muted);line-height:1.5;"><strong style="color:var(--red)">Waarschuw arts of ambulance (112)</strong> als het slachtoffer buiten bewustzijn is of niet snel opknapt.</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-    <div style="padding:0 20px 16px;font-size:0.72rem;color:var(--muted);">
-      Bron: SPADO Bergen op Zoom — Protocol "Lopen bij extreem weer" (2025)
-    </div>
-  </div>
-
-<footer>
-  Bron: <a href="https://dataplatform.knmi.nl" target="_blank">KNMI Dataplatform</a> ·
-  Methode: Liljegren (TR-26-04, 2026) · Stull (2011) · ISO 7243:2017 ·
-  Station Woensdrecht 06340
-</footer>
-
-<script>
-// ── Configuratie ─────────────────────────────────────────────────
-const WORKER_URL   = "https://knmi-proxy.barry-f41.workers.dev";
-const KNMI_DATASET = "Actuele10mindataKNMIstations";
-const KNMI_VERSION = "2";
-const STATION_NR   = 6340;
-
-// ── Hittekracht schaal (KNMI TR-26-04) ───────────────────────────
-const HK_SCALE = [
-  { hk:0,  min:-99, max:14,  label:"Geen",            color:"#4fc3f7" },
-  { hk:1,  min:14,  max:16,  label:"Verwaarloosbaar",  color:"#29b6f6" },
-  { hk:2,  min:16,  max:18,  label:"Zeer licht",       color:"#26c6da" },
-  { hk:3,  min:18,  max:20,  label:"Licht",            color:"#26c6da" },
-  { hk:4,  min:20,  max:22,  label:"Matig",            color:"#66bb6a" },
-  { hk:5,  min:22,  max:24,  label:"Verhoogd",         color:"#ffd166" },
-  { hk:6,  min:24,  max:26,  label:"Hoog",             color:"#ffa726" },
-  { hk:7,  min:26,  max:28,  label:"Hoog",             color:"#ff7043" },
-  { hk:8,  min:28,  max:30,  label:"Zeer hoog",        color:"#ef5350" },
-  { hk:9,  min:30,  max:32,  label:"Extreem",          color:"#b71c1c" },
-  { hk:10, min:32,  max:99,  label:"Uitzonderlijk",    color:"#880e0e" },
-];
-
-function calcHK(wbgt) {
-  for (const level of HK_SCALE) { if (wbgt < level.max) return level.hk; }
-  return 10;
-}
-
-// ── Schaal renderen ───────────────────────────────────────────────
-function renderScale(activeHK = -1) {
-  const grid = document.getElementById("scale-grid");
-  if (!grid) return;
-  grid.innerHTML = "";
-  HK_SCALE.forEach(({ hk, min, max, label, color }) => {
-    const el = document.createElement("div");
-    el.className = "scale-item" + (hk === activeHK ? " active" : "");
-    el.style.color = color;
-    const range = hk === 0 ? "< 14 °C" : hk === 10 ? "≥ 32 °C" : `${min}–${max} °C`;
-    el.innerHTML = `<div class="scale-dot" style="background:${color}"></div>
-      <div class="scale-info">
-        <div class="scale-hk">Hittekracht ${hk}</div>
-        <div class="scale-range">${range} · ${label}</div>
-      </div>`;
-    grid.appendChild(el);
-  });
-}
-
-function renderPips(activeHK = -1) {
-  const bar = document.getElementById("hk-bar");
-  if (!bar) return;
-  bar.innerHTML = "";
-  HK_SCALE.forEach(({ hk, color }) => {
-    const pip = document.createElement("div");
-    pip.className = "hk-pip";
-    pip.style.background = hk <= activeHK ? color : "var(--border)";
-    bar.appendChild(pip);
-  });
-}
-
-renderScale();
-renderPips();
-
-// ── WBGT & Humidex berekeningen ──────────────────────────────────
-function stullTw(ta, rh) {
-  return (ta * Math.atan(0.151977 * Math.pow(rh + 8.313659, 0.5))
-    + Math.atan(ta + rh)
-    - Math.atan(rh - 1.676331)
-    + 0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh)
-    - 4.686035);
-}
-
-function liljegrenTg(ta, Q, FF) {
-  const ff = Math.max(FF, 0.5);
-  return ta + 0.0153 * Math.sqrt(Q) * (1 - 0.066 * Math.sqrt(ff)) / (1 + 0.00036 * Q);
-}
-
-function wbgtBuiten(ta, rh, Q, FF) {
-  const tw = stullTw(ta, rh);
-  const tg = liljegrenTg(ta, Q, FF);
-  return { tw, tg, wbgt: 0.7 * tw + 0.2 * tg + 0.1 * ta };
-}
-
-function wbgtBinnen(ta, rh) {
-  return 0.7 * stullTw(ta, rh) + 0.3 * ta;
-}
-
-// NOAA Heat Index (conform SPADO tabel)
-function berekenHumidex(ta, rh) {
-  const tf = ta * 9/5 + 32;
-  const hi_f = -42.379
-    + 2.04901523  * tf
-    + 10.14333127 * rh
-    - 0.22475541  * tf * rh
-    - 0.00683783  * tf * tf
-    - 0.05481717  * rh * rh
-    + 0.00122874  * tf * tf * rh
-    + 0.00085282  * tf * rh * rh
-    - 0.00000199  * tf * tf * rh * rh;
-  return Math.round((hi_f - 32) * 5/9 * 10) / 10;
-}
-
-// ── Index keuze schakelaar ────────────────────────────────────────
-function setIndexKeuze(keuze) {
-  document.getElementById("index-keuze").value = keuze;
-  const btnW   = document.getElementById("btn-wbgt");
-  const btnH   = document.getElementById("btn-humidex");
-  const uitleg = document.getElementById("index-uitleg");
-  const elWbgt = document.getElementById("wbgt-out");
-  const elNoaa = document.getElementById("humidex-out");
-
-  if (keuze === "wbgt") {
-    btnW.style.background = "var(--accent)"; btnW.style.color = "white";
-    btnH.style.background = "transparent";   btnH.style.color = "var(--muted)";
-    uitleg.textContent = "ISO 7243 · wind + straling";
-    elWbgt.setAttribute("data-size", "groot");
-    elNoaa.setAttribute("data-size", "klein");
-  } else {
-    btnH.style.background = "var(--yellow)"; btnH.style.color = "#000";
-    btnW.style.background = "transparent";   btnW.style.color = "var(--muted)";
-    uitleg.textContent = "NOAA Heat Index · conform SPADO tabel";
-    elNoaa.setAttribute("data-size", "groot");
-    elWbgt.setAttribute("data-size", "klein");
-  }
-
-  const wbgtVal = parseFloat(document.getElementById("c-wbgt")?.textContent);
-  const noaaVal = parseFloat(document.getElementById("c-humidex")?.textContent);
-  if (!isNaN(wbgtVal) && !isNaN(noaaVal)) {
-    const actief = keuze === "humidex" ? noaaVal : wbgtVal;
-    updateAdvies(actief);
-    const hk = calcHK(wbgtVal);
-    const hkLevel = HK_SCALE[hk];
-    document.getElementById("hk-num").textContent = hk;
-    document.getElementById("hk-num").style.color = hkLevel.color;
-    document.getElementById("hk-risk").textContent = hkLevel.label;
-    document.getElementById("hk-risk").style.color = hkLevel.color;
-    renderPips(hk); renderScale(hk);
-  }
-}
-
-// ── Tab switcher ──────────────────────────────────────────────────
-function setTab(tab) {
-  document.getElementById("panel-duur").style.display = tab === "duur" ? "block" : "none";
-  document.getElementById("panel-baan").style.display = tab === "baan" ? "block" : "none";
-  document.getElementById("tab-duur").classList.toggle("active", tab === "duur");
-  document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
-}
-
-// ── Advies updaten ────────────────────────────────────────────────
-function updateAdvies(indexWaarde) {
-  const keuze = document.getElementById("index-keuze")?.value || "wbgt";
-  const isNoaa = keuze === "humidex";
-
-  const tonen = (id, zichtbaar) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = zichtbaar ? "" : "none";
-  };
-
-  tonen("tabel-duur-wbgt",  !isNoaa);
-  tonen("tabel-duur-noaa",   isNoaa);
-  tonen("tabel-baan-wbgt",  !isNoaa);
-  tonen("tabel-baan-noaa",   isNoaa);
-  tonen("bron-duur-wbgt",   !isNoaa);
-  tonen("bron-duur-noaa",    isNoaa);
-  tonen("bron-baan-wbgt",   !isNoaa);
-  tonen("bron-baan-noaa",    isNoaa);
-
-  const markeer = (cls, waarde) => {
-    document.querySelectorAll("." + cls).forEach(row => {
-      const min = parseFloat(row.dataset.min ?? 0);
-      const max = parseFloat(row.dataset.max ?? 999);
-      row.classList.toggle("actief-rij", waarde >= min && waarde < max);
-    });
-  };
-
-  if (isNoaa) {
-    markeer("hk-row-noaa",      indexWaarde);
-    markeer("hk-row-baan-noaa", indexWaarde);
-  } else {
-    markeer("hk-row",      indexWaarde);
-    markeer("hk-row-baan", indexWaarde);
-  }
-
-  const duurNiveaus = isNoaa ? [
-    { max:18,  kleur:"#4fc3f7", icon:"✅", titel:"Laag — normaal trainen",
-      tekst:"Normaal trainen. Voldoende drinken gedurende de dag." },
-    { max:21,  kleur:"#29b6f6", icon:"ℹ️", titel:"Middelmatig — let op kwetsbare sporters",
-      tekst:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
-    { max:26,  kleur:"#ffd166", icon:"⚠️", titel:"Hoog — intensiteit beperken",
-      tekst:"Wees extra waakzaam op oververhitting. Beperk intensiteit. Pauze elke 20 min in schaduw." },
-    { max:28,  kleur:"#ffa726", icon:"🚨", titel:"Zeer hoog — Wegcoördinator beslist",
-      tekst:"Beperk duur tot 1 uur en pas programma aan. Aanpassingen: ochtend/avond lopen, inkorten, schaduw, meer pauzes, drinken meenemen, hoofd en nek beschermen." },
-    { max:999, kleur:"#ef5350", icon:"🛑", titel:"Afgelasten — Wegcoördinator gelast af",
-      tekst:"Sterk afgeraden te gaan sporten. Training uitstellen naar ander tijdstip of afgelasten." },
-  ] : [
-    { max:10,  kleur:"#90caf9", icon:"❄️", titel:"Koud — let op onderkoeling",
-      tekst:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
-    { max:18,  kleur:"#2d8a4e", icon:"✅", titel:"Ideaal — optimale omstandigheden",
-      tekst:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
-    { max:23,  kleur:"#e8c840", icon:"ℹ️", titel:"Verhoogd risico — extra maatregelen",
-      tekst:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
-    { max:28,  kleur:"#d94f3d", icon:"🚨", titel:"Hoog risico — Wegcoördinator beslist",
-      tekst:"Beperk duur tot 1 uur. Lichte kleding, meer pauzes, drinken meenemen, lopen in schaduw/bos, hoofd en nek beschermen." },
-    { max:999, kleur:"#b71c1c", icon:"🛑", titel:"Afgelasten — KNAU / ACSM zwarte vlag",
-      tekst:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
-  ];
-
-  const baanNiveaus = isNoaa ? [
-    { max:23,  kleur:"#2d8a4e", icon:"✅", titel:"Goed — normaal trainen",
-      tekst:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-    { max:30,  kleur:"#ffd166", icon:"ℹ️", titel:"Matig — herstel verhogen",
-      tekst:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen meer rustpauzes." },
-    { max:35,  kleur:"#d94f3d", icon:"🚨", titel:"Hoog — essentieel beperken",
-      tekst:"Beperkt tot essentiële series. Koeling verplicht tussen pogingen. Afbreken bij klachten." },
-    { max:999, kleur:"#b71c1c", icon:"🛑", titel:"Afgelasten — verplaatsen",
-      tekst:"Afgelasten of verplaatsen naar koeler moment van de dag." },
-  ] : [
-    { max:18,  kleur:"#2d8a4e", icon:"✅", titel:"Goed — normaal trainen",
-      tekst:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-    { max:23,  kleur:"#e8c840", icon:"ℹ️", titel:"Matig — extra drinken",
-      tekst:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
-    { max:28,  kleur:"#ef9f27", icon:"⚠️", titel:"Verhoogd — rust verlengen",
-      tekst:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
-    { max:31,  kleur:"#d94f3d", icon:"🚨", titel:"Hoog risico — essentieel beperken",
-      tekst:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
-    { max:999, kleur:"#b71c1c", icon:"🛑", titel:"Afgelasten — NSCA zwarte vlag",
-      tekst:"Alle baanonderdelen afgelasten. NSCA: gevaar voor alle atleten." },
-  ];
-
-  function setBanner(prefix, niveaus, waarde) {
-    const n = niveaus.find(x => waarde < x.max) || niveaus[niveaus.length-1];
-    const icon   = document.getElementById(`advies-${prefix}-icon`);
-    const titel  = document.getElementById(`advies-${prefix}-titel`);
-    const tekst  = document.getElementById(`advies-${prefix}-tekst`);
-    const banner = document.getElementById(`advies-${prefix}-banner`);
-    if (icon)   icon.textContent  = n.icon;
-    if (titel)  { titel.textContent = n.titel; titel.style.color = n.kleur; }
-    if (tekst)  tekst.textContent = n.tekst;
-    if (banner) banner.style.borderColor = n.kleur;
-  }
-
-  setBanner("duur", duurNiveaus, indexWaarde);
-  setBanner("baan", baanNiveaus, indexWaarde);
-}
-
-// ── Data verwerken ────────────────────────────────────────────────
-function verwerkData(data) {
-  const { ta, rh, ff, q, fdir } = data;
-
-  const set = (id, val, dec=1) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = val != null ? val.toFixed(dec) : "—";
-    el.classList.remove("fresh"); void el.offsetWidth; el.classList.add("fresh");
-  };
-
-  set("v-ta", ta); set("v-rh", rh, 0); set("v-ff", ff);
-  set("v-q",  q,  0); set("v-fdir", fdir, 0);
-
-  if (ta == null || rh == null || ff == null || q == null) return;
-
-  const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
-  const wbgt_in = wbgtBinnen(ta, rh);
-  const hk      = calcHK(wbgt);
-  const hkLevel = HK_SCALE[hk];
-  const humidex = berekenHumidex(ta, rh);
-  const humidexKleur = humidex < 25 ? "var(--green)" : humidex < 35 ? "var(--yellow)" :
-                       humidex < 40 ? "var(--orange)" : "var(--red)";
-  const humidexRisico = humidex < 20 ? "Geen ongemak" : humidex < 25 ? "Licht ongemak" :
-                        humidex < 30 ? "Merkbaar ongemak" : humidex < 35 ? "Aanzienlijk ongemak" :
-                        humidex < 40 ? "Groot ongemak" : humidex < 45 ? "Gevaarlijk" : "Hitteberoerte mogelijk";
-
-  set("c-tw", tw); set("c-tg", tg); set("c-wbgt", wbgt);
-  set("c-wbgt-in", wbgt_in); set("c-hk", hk, 0); set("c-humidex", humidex);
-
-  const risicoEl = document.getElementById("c-humidex-risico");
-  if (risicoEl) { risicoEl.textContent = humidexRisico; risicoEl.style.color = humidexKleur; }
-
-  // Hero WBGT
-  const heroWbgt = document.getElementById("wbgt-out");
-  heroWbgt.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit">°C</span>`;
-  heroWbgt.style.color = hkLevel.color;
-  heroWbgt.classList.remove("fresh"); void heroWbgt.offsetWidth; heroWbgt.classList.add("fresh");
-
-  // Hero Humidex
-  const heroHx = document.getElementById("humidex-out");
-  if (heroHx) {
-    heroHx.innerHTML = `${humidex.toFixed(1)}<span class="wbgt-unit">°C</span>`;
-    heroHx.style.color = humidexKleur;
-    heroHx.classList.remove("fresh"); void heroHx.offsetWidth; heroHx.classList.add("fresh");
-  }
-
-  // Meettijd
-  const nu10 = new Date();
-  nu10.setSeconds(0,0);
-  nu10.setMinutes(Math.floor(nu10.getMinutes()/10)*10);
-  const meetStr = nu10.toLocaleTimeString("nl-NL", { hour:"2-digit", minute:"2-digit" });
-  document.getElementById("wbgt-time").textContent =
-    `WBGT ${wbgt.toFixed(1)} · Gevoelstemp. ${humidex.toFixed(1)} · Meting ca. ${meetStr}`;
-
-  // Hittekracht
-  document.getElementById("hk-num").textContent = hk;
-  document.getElementById("hk-num").style.color = hkLevel.color;
-  document.getElementById("hk-risk").textContent = hkLevel.label;
-  document.getElementById("hk-risk").style.color = hkLevel.color;
-  renderPips(hk); renderScale(hk);
-
-  // Advies
-  const keuze = document.getElementById("index-keuze")?.value || "wbgt";
-  updateAdvies(keuze === "humidex" ? humidex : wbgt);
-}
-
-// ── KNMI data ophalen ─────────────────────────────────────────────
-async function fetchKNMI() {
-  const btn = document.getElementById("update-btn");
-  btn.disabled = true;
-  btn.classList.add("loading");
-  setStatus("Verbinding maken met KNMI Dataplatform…");
-
-  try {
-    const resp = await fetch(`${WORKER_URL}/wbgt`);
-    const data = await resp.json();
-    if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
-    verwerkData(data);
-    const bronStr = data.bron || "Weerlive.nl";
-    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · ${bronStr}`, "ok");
-  } catch (err) {
-    setStatus(`⚠ Fout: ${err.message}`, "error");
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.classList.remove("loading");
-  }
-}
-
-function setStatus(msg, type = "") {
-  const bar = document.getElementById("status-bar");
-  bar.textContent = msg;
-  bar.className = type;
-}
-
-// ── Auto-load bij openen + elke 10 min ───────────────────────────
-window.addEventListener("load", () => {
-  fetchKNMI();
-  setInterval(fetchKNMI, 10 * 60 * 1000);
-});
-</script>
-
-</body>
-</html>
