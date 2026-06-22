@@ -952,36 +952,74 @@ function humidexNiveau(hx) {
 const ADVIES = {
   duur: {
     wbgt: [
-      { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          kort:"Koud",        tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
-      { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     kort:"Ideaal",      tx:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
-      { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         kort:"Verhoogd",    tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
-      { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", kort:"Hoog risico", tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", kort:"Afgelasten",  tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
+      { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          kort:"Koud",        ernst:"groen", tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen.", bericht:"Goed opwarmen voor de start. Let op kwetsbare lopers bij deze lage temperaturen." },
+      { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     kort:"Ideaal",      ernst:"groen", tx:"Beste condities voor duurlopen. Normale vochtinname volstaat.", bericht:"Geen bezwaren voor de training. Normale vochtinname volstaat." },
+      { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         kort:"Verhoogd",    ernst:"geel",  tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw.", bericht:"Training gaat door, maar let extra op je groep: drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten." },
+      { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", kort:"Hoog risico", ernst:"rood",  tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen.", bericht:"Training is aangepast: beperk de duur tot maximaal 1 uur, loop bij voorkeur in de schaduw en bouw extra pauzes in. Lichte kleding en voldoende drinken zijn verplicht." },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", kort:"Afgelasten",  ernst:"zwart", tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden.", bericht:"De waarde is boven de veilige grens. Niet lopen onder deze omstandigheden." },
     ],
     noaa: [
-      { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",                  kort:"Laag",        tx:"Normaal trainen. Voldoende drinken gedurende de dag." },
-      { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", kort:"Middelmatig", tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
-      { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",             kort:"Hoog",        tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw." },
-      { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",       kort:"Zeer hoog",   tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
-      { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",   kort:"Afgelasten",  tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten." },
+      { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",                  kort:"Laag",        ernst:"groen", tx:"Normaal trainen. Voldoende drinken gedurende de dag.", bericht:"Geen bezwaren voor de training. Voldoende drinken gedurende de dag." },
+      { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", kort:"Middelmatig", ernst:"geel",  tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht.", bericht:"Training gaat door, maar let extra op je groep: drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten." },
+      { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",             kort:"Hoog",        ernst:"geel",  tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw.", bericht:"Wees extra waakzaam op oververhitting. Beperk de intensiteit en duur van de training. Drinkpauze elke 20 min in de schaduw." },
+      { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",       kort:"Zeer hoog",   ernst:"rood",  tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen.", bericht:"Training is aangepast: beperk de duur tot maximaal 1 uur en pas het programma aan (ochtend/avond lopen, inkorten, lichte kleding, extra pauzes, drinken meenemen, schaduw zoeken)." },
+      { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",   kort:"Afgelasten",  ernst:"zwart", tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten.", bericht:"De waarde is boven de veilige grens. Training uitstellen of afgelasten." },
     ],
   },
   baan: {
     wbgt: [
-      { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-      { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 kort:"Matig",       tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
-      { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             kort:"Verhoogd",    tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
-      { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     kort:"Hoog risico", tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         kort:"Afgelasten",  tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten." },
+      { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        ernst:"groen", tx:"Alle baanonderdelen normaal. Reguliere hydratatie.", bericht:"" },
+      { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 kort:"Matig",       ernst:"geel",  tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk.", bericht:"" },
+      { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             kort:"Verhoogd",    ernst:"geel",  tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels.", bericht:"" },
+      { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     kort:"Hoog risico", ernst:"rood",  tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten.", bericht:"" },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         kort:"Afgelasten",  ernst:"zwart", tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten.", bericht:"" },
     ],
     noaa: [
-      { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-      { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              kort:"Matig",       tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes." },
-      { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            kort:"Hoog",        tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten." },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            kort:"Afgelasten",  tx:"Afgelasten of verplaatsen naar koeler moment." },
+      { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        ernst:"groen", tx:"Alle baanonderdelen normaal. Reguliere hydratatie.", bericht:"" },
+      { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              kort:"Matig",       ernst:"geel",  tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes.", bericht:"" },
+      { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            kort:"Hoog",        ernst:"rood",  tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten.", bericht:"" },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            kort:"Afgelasten",  ernst:"zwart", tx:"Afgelasten of verplaatsen naar koeler moment.", bericht:"" },
     ],
   },
 };
+
+// Ondertekening per discipline
+const ONDERTEKENING = {
+  duur: "— Coördinator wegatletiek SPADO",
+  baan: "— Coördinator baanatletiek SPADO",
+};
+
+// Bouw één coördinatorbericht volgens een vaste structuur, zodat alle
+// niveaus, indexen en disciplines dezelfde opmaak hebben.
+function maakBericht(niveau, indexNaam, waarde, discipline, dagStr) {
+  // Baan heeft nog geen eigen berichttekst: val terug op de duur-tekst
+  // van hetzelfde niveau zodat er altijd iets staat.
+  let instructie = niveau.bericht;
+  if (!instructie) {
+    const idx = indexNaam.includes("NOAA") ? "noaa" : "wbgt";
+    const terug = ADVIES.duur[idx].find(x => x.kort === niveau.kort);
+    instructie = terug ? terug.bericht : niveau.tx;
+  }
+
+  const afsluiting = {
+    groen: "Fijne training!",
+    geel:  "Informeer jullie groepen alstublieft.",
+    rood:  "Informeer jullie groepen alstublieft.",
+    zwart: `De training van ${dagStr} gaat niet door. Informeer jullie groepen alstublieft.`,
+  }[niveau.ernst] || "";
+
+  return [
+    "Beste trainers,",
+    "",
+    `${indexNaam} is momenteel ${waarde} °C — niveau: ${niveau.kort.toLowerCase()}.`,
+    "",
+    instructie,
+    "",
+    afsluiting,
+    "",
+    ONDERTEKENING[discipline] || ONDERTEKENING.duur,
+  ].join("\n");
+}
 
 function actieveDiscipline() {
   return document.getElementById("tab-baan")?.classList.contains("active") ? "baan" : "duur";
@@ -1247,59 +1285,10 @@ function stuurWhatsApp() {
   const waarde  = isNoaa ? noaa : wbgt;
   const indexNm = isNoaa ? "Gevoelstemp. (NOAA)" : "WBGT";
   const dagStr  = new Date().toLocaleDateString("nl-NL", { weekday:"long", day:"numeric", month:"long" });
+  const disc    = actieveDiscipline();
 
-  let tekst;
-
-  if (isNoaa) {
-    // NOAA drempels: <18 Laag, 18-21 Middelmatig, 21-26 Hoog, 26-28 Zeer hoog, >28 Afgelasten
-    if (actief < 18) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C — geen bezwaren voor de training vanavond.\n\n` +
-        `Fijne training!\n— Coördinator wegatletiek SPADO`;
-    } else if (actief < 21) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: middelmatig).\n\n` +
-        `Training gaat door maar let extra op je groep: zorg voor drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten.\n\n` +
-        `— Coördinator wegatletiek SPADO`;
-    } else if (actief < 26) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: hoog).\n\n` +
-        `Wees extra waakzaam op oververhitting. Beperk de intensiteit en duur van de training. Drinkpauze elke 20 min in de schaduw.\n\n` +
-        `— Coördinator wegatletiek SPADO`;
-    } else if (actief < 28) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: zeer hoog).\n\n` +
-        `Training is aangepast: beperk de duur tot maximaal 1 uur en pas het programma aan. Informeer jullie groepen alstublieft.\n\n` +
-        `— Coördinator wegatletiek SPADO`;
-    } else {
-      tekst =
-        `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
-        `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
-        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
-    }
-  } else {
-    // WBGT drempels: <18 Ideaal, 18-23 Verhoogd, 23-28 Hoog risico, >28 Afgelasten
-    if (actief < 18) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C — geen bezwaren voor de training vanavond.\n\n` +
-        `Fijne training!\n— Coördinator wegatletiek SPADO`;
-    } else if (actief < 23) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: verhoogd).\n\n` +
-        `Training gaat door maar let extra op je groep: zorg voor drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten.\n\n` +
-        `— Coördinator wegatletiek SPADO`;
-    } else if (actief < 28) {
-      tekst =
-        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: hoog risico).\n\n` +
-        `Training is aangepast: beperk de duur tot maximaal 1 uur, loop bij voorkeur in de schaduw en bouw extra pauzes in. Lichte kleding en voldoende drinken zijn verplicht.\n\n` +
-        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
-    } else {
-      tekst =
-        `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
-        `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
-        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
-    }
-  }
+  const niveau  = adviesNiveau(actief, keuze, disc);
+  const tekst   = maakBericht(niveau, indexNm, waarde, disc, dagStr);
 
   window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank");
 }
