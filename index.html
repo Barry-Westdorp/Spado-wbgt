@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WBGT Woensdrecht">
@@ -1234,8 +1235,7 @@ function stuurWhatsApp() {
       tekst =
         `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
         `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
-        `Informeer jullie groepen alstublieft.\n\n` +
-        `— Coördinator wegatletiek SPADO`;
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
     }
   } else {
     // WBGT drempels: <18 Ideaal, 18-23 Verhoogd, 23-28 Hoog risico, >28 Afgelasten
