@@ -550,7 +550,7 @@
       <!-- Gevuld via JavaScript -->
     </div>
     <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
-      Straling geschat op basis van bewolking · RH niet beschikbaar in uurverwachting · WBGT is indicatief
+      Voorspelling via Open-Meteo · Temperatuur, RH en straling per uur · WBGT en Gevoelstemp. berekend via Liljegren / Stull / NOAA
     </div>
   </div>
 
@@ -1053,6 +1053,11 @@ function setIndexKeuze(keuze) {
   if (kopEl)  kopEl.textContent  = keuze === "humidex" ? "Gevoelstemp. (NOAA)" : "WBGT";
   if (bronEl) bronEl.textContent = keuze === "humidex" ? "Advies SPADO 2025" : "Advies SPADO / KNAU / ACSM";
 
+  // Herrender forecast met nieuwe switch
+  if (window._lastVoorspelling) {
+    renderVoorspelling(window._lastVoorspelling);
+  }
+
   const wbgtVal = parseFloat(document.getElementById("c-wbgt")?.textContent);
   const noaaVal = parseFloat(document.getElementById("c-humidex")?.textContent);
   if (!isNaN(wbgtVal) && !isNaN(noaaVal)) {
@@ -1273,8 +1278,9 @@ function verwerkData(data) {
   updateAdvies(actief);
   updateNiveauBadge(actief);
 
-  // Voorspelling renderen
+  // Sla voorspelling op en render
   if (data.voorspelling && data.voorspelling.length > 0) {
+    window._lastVoorspelling = data.voorspelling;
     renderVoorspelling(data.voorspelling);
     const fcTitel2 = document.getElementById("forecast-header-titel");
     const keuze2 = document.getElementById("index-keuze")?.value || "wbgt";
@@ -1300,7 +1306,10 @@ function renderVoorspelling(uren) {
     const q_u    = u.q || 0;
     const regen_u= u.neerslag || 0;
 
-    const rh_act = parseFloat(document.getElementById("v-rh")?.textContent) || 60;
+    // Gebruik uur-RH van Open-Meteo indien beschikbaar, anders actuele RH
+    const rh_act = u.rh !== null && u.rh !== undefined
+      ? u.rh
+      : (parseFloat(document.getElementById("v-rh")?.textContent) || 60);
     const tw_u   = stullTw(ta_u || 20, rh_act);
     const tg_u   = liljegrenTg(ta_u || 20, q_u, ff_u);
     const wbgt_u = ta_u !== null ? Math.round((0.7*tw_u + 0.2*tg_u + 0.1*ta_u) * 10) / 10 : null;
@@ -1317,15 +1326,16 @@ function renderVoorspelling(uren) {
       actief_u < 23 ? "Verhoogd" :
       actief_u < 28 ? "Hoog risico" : "Afgelasten";
 
-    const tijdStr = u.uur ? u.uur.slice(-5) : "—";
+    const tijdStr  = u.uur || "—";
     const regenStr = regen_u > 0 ? ` · 🌧 ${regen_u}mm` : "";
+    const rhStr    = rh_act ? ` · ${Math.round(rh_act)}%` : "";
 
     const el = document.createElement("div");
     el.className = "fc-uur";
     el.innerHTML = `
       <div class="fc-tijd">${tijdStr}</div>
-      <div class="fc-wbgt" style="color:${kleur};">${wbgt_u !== null ? wbgt_u.toFixed(1) : "—"}<span class="fc-unit">°C</span></div>
-      <div class="fc-ta">${ta_u !== null ? ta_u.toFixed(1)+"°C" : "—"}${regenStr}</div>
+      <div class="fc-wbgt" style="color:${kleur};">${actief_u !== null ? actief_u.toFixed(1) : "—"}<span class="fc-unit">°C</span></div>
+      <div class="fc-ta" style="color:var(--muted);">${ta_u !== null ? ta_u.toFixed(1)+"°C" : "—"}${rhStr}${regenStr}</div>
       <div class="fc-balk" style="background:${kleur};opacity:0.5;"></div>
       <div class="fc-niveau" style="color:${kleur};">${niveauLabel}</div>
     `;
