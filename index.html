@@ -135,8 +135,9 @@
   }
 
   @media (max-width: 700px) {
-    main { grid-template-columns: 1fr !important; }
+    main { grid-template-columns: 1fr !important; padding: 16px 12px 0; }
     .hero-inner { flex-direction: column !important; gap: 14px !important; padding: 16px !important; }
+    .hero-stats { flex-wrap: wrap !important; gap: 16px 24px !important; }
     [data-size="groot"] { font-size: 2.8rem !important; }
     [data-size="groot"] .wbgt-unit { font-size: 1.2rem !important; }
     [data-size="klein"] { font-size: 1.6rem !important; }
@@ -148,9 +149,9 @@
     .advies-tabel td, .advies-tabel th { padding: 6px 8px; }
     header { padding: 14px 16px; }
   }
-  @media (max-width: 700px) {
-    main { grid-template-columns: 1fr; padding: 16px 12px 0; }
-    header { padding: 20px 16px; }
+  @media (max-width: 380px) {
+    /* Heel smalle toestellen: stats volledig onder elkaar */
+    .hero-stats { flex-direction: column !important; gap: 12px !important; }
   }
 
   /* ── Cards ────────────────────────────────────────────────── */
@@ -194,6 +195,35 @@
   }
 
   .wbgt-main { display: flex; flex-direction: column; }
+
+  /* Container van de twee hoofdtemperaturen (WBGT + Gevoelstemp) */
+  .hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hero-stats-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .stat-item { min-width: 0; }
+  .stat-caption {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  /* Knoppenbalk onder de temperaturen, met ademruimte */
+  .wa-bar {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 
   .wbgt-label {
     font-size: 0.72rem;
@@ -255,8 +285,10 @@
     height: 6px;
     border-radius: 3px;
     background: var(--border);
-    transition: background 0.4s;
+    opacity: 0.35;
+    transition: background 0.4s, opacity 0.4s;
   }
+  .hk-pip.actief { opacity: 1; }
 
   .hk-risk-label {
     font-size: 0.85rem;
@@ -419,7 +451,12 @@
     line-height: 1.5;
   }
   .advies-tabel tr:last-child td { border-bottom: none; }
-  .advies-tabel tr.actief-rij td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .advies-tabel tr.actief-rij td {
+    background: color-mix(in srgb, var(--rij-kleur, var(--accent)) 18%, transparent);
+  }
+  .advies-tabel tr.actief-rij td:first-child {
+    box-shadow: inset 4px 0 0 0 var(--rij-kleur, var(--accent));
+  }
 
   /* ── Index grootte via data-size ───────────────────────── */
   [data-size="groot"] { font-size: 3.4rem !important; }
@@ -492,20 +529,20 @@
     <div class="hero-inner">
       <div class="wbgt-main">
         <div class="wbgt-label">WBGT Buiten (ISO 7243)</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:nowrap;">
-            <div style="min-width:0;">
-              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">WBGT</div>
+        <div class="hero-stats">
+          <div class="hero-stats-row">
+            <div class="stat-item">
+              <div class="stat-caption">WBGT</div>
               <div id="wbgt-out" class="wbgt-value" data-size="groot">—<span class="wbgt-unit">°C</span></div>
             </div>
-            <div style="min-width:0;">
-              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Gevoelstemp. (NOAA)</div>
+            <div class="stat-item">
+              <div class="stat-caption">Gevoelstemp. (NOAA)</div>
               <div id="humidex-out" class="wbgt-value" data-size="klein" style="color:var(--yellow);">—<span class="wbgt-unit">°C</span></div>
             </div>
           </div>
         </div>
         <div class="wbgt-sub" id="wbgt-time">Nog geen meting geladen</div>
-      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div class="wa-bar">
         <button onclick="stuurWhatsApp()" id="wa-btn" style="background:#25D366;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background 0.2s;flex-shrink:0;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.116 1.523 5.847L.057 23.882a.5.5 0 0 0 .61.61l6.044-1.47A11.937 11.937 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.508-5.23-1.394l-.374-.216-3.884.944.965-3.792-.235-.389A9.945 9.945 0 0 1 2 12C2 6.478 6.478 2 12 2s10 4.478 10 10-4.478 10-10 10z"/></svg>
           <span id="wa-btn-tekst">Stuur bericht</span>
@@ -1095,10 +1132,14 @@ function renderPips(activeHK = -1) {
   const bar = document.getElementById("hk-bar");
   if (!bar) return;
   bar.innerHTML = "";
-  HK_SCALE.forEach(({ hk, color }) => {
+  // Egale kleur: alle actieve pips krijgen de kleur van het HUIDIGE niveau,
+  // inactieve pips blijven subtiel (via .hk-pip opacity in CSS).
+  const huidigeKleur = activeHK >= 0 ? HK_SCALE[activeHK].color : "var(--border)";
+  HK_SCALE.forEach(({ hk }) => {
     const pip = document.createElement("div");
-    pip.className = "hk-pip";
-    pip.style.background = hk <= activeHK ? color : "var(--border)";
+    const actief = hk <= activeHK;
+    pip.className = "hk-pip" + (actief ? " actief" : "");
+    pip.style.background = actief ? huidigeKleur : "var(--border)";
     bar.appendChild(pip);
   });
 }
@@ -1251,7 +1292,16 @@ function updateAdvies(indexWaarde) {
   tonen("bron-baan-wbgt",  !isNoaa); tonen("bron-baan-noaa",  isNoaa);
 
   const markeer = (cls, w) => document.querySelectorAll("."+cls).forEach(r => {
-    r.classList.toggle("actief-rij", w >= parseFloat(r.dataset.min??0) && w < parseFloat(r.dataset.max??999));
+    const actief = w >= parseFloat(r.dataset.min??0) && w < parseFloat(r.dataset.max??999);
+    r.classList.toggle("actief-rij", actief);
+    if (actief) {
+      // Lees de niveaukleur uit het gekleurde vierkantje in de eerste cel
+      const swatch = r.querySelector("td:first-child div");
+      const kleur = swatch ? (swatch.style.background || swatch.style.backgroundColor) : "";
+      if (kleur) r.style.setProperty("--rij-kleur", kleur);
+    } else {
+      r.style.removeProperty("--rij-kleur");
+    }
   });
 
   if (isNoaa) { markeer("hk-row-noaa", indexWaarde); markeer("hk-row-baan-noaa", indexWaarde); }
