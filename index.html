@@ -1132,14 +1132,13 @@ function renderPips(activeHK = -1) {
   const bar = document.getElementById("hk-bar");
   if (!bar) return;
   bar.innerHTML = "";
-  // Egale kleur: alle actieve pips krijgen de kleur van het HUIDIGE niveau,
+  // Verloop: elke actieve pip krijgt zijn EIGEN HK-kleur (blauw -> rood),
   // inactieve pips blijven subtiel (via .hk-pip opacity in CSS).
-  const huidigeKleur = activeHK >= 0 ? HK_SCALE[activeHK].color : "var(--border)";
-  HK_SCALE.forEach(({ hk }) => {
+  HK_SCALE.forEach(({ hk, color }) => {
     const pip = document.createElement("div");
     const actief = hk <= activeHK;
     pip.className = "hk-pip" + (actief ? " actief" : "");
-    pip.style.background = actief ? huidigeKleur : "var(--border)";
+    pip.style.background = actief ? color : "var(--border)";
     bar.appendChild(pip);
   });
 }
