@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -46,6 +46,10 @@
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 28px 32px 24px;
+    /* iOS notch/Dynamic Island: schuif de header onder de statusbalk vandaan */
+    padding-top: calc(28px + env(safe-area-inset-top, 0px));
+    padding-left: calc(32px + env(safe-area-inset-left, 0px));
+    padding-right: calc(32px + env(safe-area-inset-right, 0px));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -147,7 +151,7 @@
     .scale-grid { grid-template-columns: 1fr 1fr !important; }
     .advies-tabel { font-size: 0.78rem; }
     .advies-tabel td, .advies-tabel th { padding: 6px 8px; }
-    header { padding: 14px 16px; }
+    header { padding: 14px 16px; padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
   }
   @media (max-width: 380px) {
     /* Heel smalle toestellen: stats volledig onder elkaar */
@@ -359,6 +363,7 @@
 
   .scale-item.active {
     border-color: currentColor;
+    background: var(--surface); /* fallback voor oude browsers zonder color-mix */
     background: color-mix(in srgb, currentColor 8%, var(--surface));
   }
 
@@ -452,6 +457,7 @@
   }
   .advies-tabel tr:last-child td { border-bottom: none; }
   .advies-tabel tr.actief-rij td {
+    background: rgba(255,255,255,0.06); /* fallback zonder color-mix; rand hieronder blijft altijd zichtbaar */
     background: color-mix(in srgb, var(--rij-kleur, var(--accent)) 18%, transparent);
   }
   .advies-tabel tr.actief-rij td:first-child {
@@ -475,7 +481,7 @@
     transition: background 0.2s;
   }
   .fc-uur:last-child { border-right: none; }
-  .fc-uur.actief-niveau { background: color-mix(in srgb, currentColor 8%, var(--card)); }
+  .fc-uur.actief-niveau { background: var(--card); background: color-mix(in srgb, currentColor 8%, var(--card)); }
   .fc-tijd { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
   .fc-wbgt { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
   .fc-unit { font-size: 0.72rem; color: var(--muted); }
