@@ -2,14 +2,15 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WBGT Woensdrecht">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="preconnect" href="https://knmi-proxy.barry-f41.workers.dev">
+<link rel="dns-prefetch" href="https://knmi-proxy.barry-f41.workers.dev">
 <title>WBGT · Woensdrecht · KNMI Hittekracht</title>
 <style>
   /* ── Reset & base ─────────────────────────────────────────── */
@@ -46,10 +47,6 @@
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 28px 32px 24px;
-    /* iOS notch/Dynamic Island: schuif de header onder de statusbalk vandaan */
-    padding-top: calc(28px + env(safe-area-inset-top, 0px));
-    padding-left: calc(32px + env(safe-area-inset-left, 0px));
-    padding-right: calc(32px + env(safe-area-inset-right, 0px));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -139,9 +136,8 @@
   }
 
   @media (max-width: 700px) {
-    main { grid-template-columns: 1fr !important; padding: 16px 12px 0; }
+    main { grid-template-columns: 1fr !important; }
     .hero-inner { flex-direction: column !important; gap: 14px !important; padding: 16px !important; }
-    .hero-stats { flex-wrap: wrap !important; gap: 16px 24px !important; }
     [data-size="groot"] { font-size: 2.8rem !important; }
     [data-size="groot"] .wbgt-unit { font-size: 1.2rem !important; }
     [data-size="klein"] { font-size: 1.6rem !important; }
@@ -151,11 +147,11 @@
     .scale-grid { grid-template-columns: 1fr 1fr !important; }
     .advies-tabel { font-size: 0.78rem; }
     .advies-tabel td, .advies-tabel th { padding: 6px 8px; }
-    header { padding: 14px 16px; padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+    header { padding: 14px 16px; }
   }
-  @media (max-width: 380px) {
-    /* Heel smalle toestellen: stats volledig onder elkaar */
-    .hero-stats { flex-direction: column !important; gap: 12px !important; }
+  @media (max-width: 700px) {
+    main { grid-template-columns: 1fr; padding: 16px 12px 0; }
+    header { padding: 20px 16px; }
   }
 
   /* ── Cards ────────────────────────────────────────────────── */
@@ -199,35 +195,6 @@
   }
 
   .wbgt-main { display: flex; flex-direction: column; }
-
-  /* Container van de twee hoofdtemperaturen (WBGT + Gevoelstemp) */
-  .hero-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .hero-stats-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .stat-item { min-width: 0; }
-  .stat-caption {
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-  /* Knoppenbalk onder de temperaturen, met ademruimte */
-  .wa-bar {
-    margin-top: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
 
   .wbgt-label {
     font-size: 0.72rem;
@@ -289,10 +256,8 @@
     height: 6px;
     border-radius: 3px;
     background: var(--border);
-    opacity: 0.35;
-    transition: background 0.4s, opacity 0.4s;
+    transition: background 0.4s;
   }
-  .hk-pip.actief { opacity: 1; }
 
   .hk-risk-label {
     font-size: 0.85rem;
@@ -363,7 +328,6 @@
 
   .scale-item.active {
     border-color: currentColor;
-    background: var(--surface); /* fallback voor oude browsers zonder color-mix */
     background: color-mix(in srgb, currentColor 8%, var(--surface));
   }
 
@@ -456,13 +420,7 @@
     line-height: 1.5;
   }
   .advies-tabel tr:last-child td { border-bottom: none; }
-  .advies-tabel tr.actief-rij td {
-    background: rgba(255,255,255,0.06); /* fallback zonder color-mix; rand hieronder blijft altijd zichtbaar */
-    background: color-mix(in srgb, var(--rij-kleur, var(--accent)) 18%, transparent);
-  }
-  .advies-tabel tr.actief-rij td:first-child {
-    box-shadow: inset 4px 0 0 0 var(--rij-kleur, var(--accent));
-  }
+  .advies-tabel tr.actief-rij td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 
   /* ── Index grootte via data-size ───────────────────────── */
   [data-size="groot"] { font-size: 3.4rem !important; }
@@ -481,7 +439,7 @@
     transition: background 0.2s;
   }
   .fc-uur:last-child { border-right: none; }
-  .fc-uur.actief-niveau { background: var(--card); background: color-mix(in srgb, currentColor 8%, var(--card)); }
+  .fc-uur.actief-niveau { background: color-mix(in srgb, currentColor 8%, var(--card)); }
   .fc-tijd { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
   .fc-wbgt { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
   .fc-unit { font-size: 0.72rem; color: var(--muted); }
@@ -535,23 +493,23 @@
     <div class="hero-inner">
       <div class="wbgt-main">
         <div class="wbgt-label">WBGT Buiten (ISO 7243)</div>
-        <div class="hero-stats">
-          <div class="hero-stats-row">
-            <div class="stat-item">
-              <div class="stat-caption">WBGT</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:nowrap;">
+            <div style="min-width:0;">
+              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">WBGT</div>
               <div id="wbgt-out" class="wbgt-value" data-size="groot">—<span class="wbgt-unit">°C</span></div>
             </div>
-            <div class="stat-item">
-              <div class="stat-caption">Gevoelstemp. (NOAA)</div>
+            <div style="min-width:0;">
+              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Gevoelstemp. (NOAA)</div>
               <div id="humidex-out" class="wbgt-value" data-size="klein" style="color:var(--yellow);">—<span class="wbgt-unit">°C</span></div>
             </div>
           </div>
         </div>
         <div class="wbgt-sub" id="wbgt-time">Nog geen meting geladen</div>
-      <div class="wa-bar">
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <button onclick="stuurWhatsApp()" id="wa-btn" style="background:#25D366;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background 0.2s;flex-shrink:0;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.116 1.523 5.847L.057 23.882a.5.5 0 0 0 .61.61l6.044-1.47A11.937 11.937 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.508-5.23-1.394l-.374-.216-3.884.944.965-3.792-.235-.389A9.945 9.945 0 0 1 2 12C2 6.478 6.478 2 12 2s10 4.478 10 10-4.478 10-10 10z"/></svg>
-          <span id="wa-btn-tekst">Stuur bericht</span>
+          <span id="wa-btn-tekst">Stuur update</span>
         </button>
         <span id="wa-niveau-badge" style="font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:20px;display:none;"></span>
       </div>
@@ -970,151 +928,6 @@ function calcHK(wbgt) {
   return 10;
 }
 
-// ── Humidex / gevoelstemperatuur schaal (NOAA-indeling) ────────────
-// Eén bron voor kleur én label, zodat ze nooit uit elkaar lopen.
-// max = bovengrens (exclusief) van de categorie.
-const HUMIDEX_SCALE = [
-  { max: 20, label: "Geen ongemak",          color: "var(--green)"  },
-  { max: 25, label: "Licht ongemak",          color: "var(--green)"  },
-  { max: 30, label: "Merkbaar ongemak",       color: "var(--yellow)" },
-  { max: 35, label: "Aanzienlijk ongemak",    color: "var(--orange)" },
-  { max: 40, label: "Groot ongemak",          color: "var(--orange)" },
-  { max: 45, label: "Gevaarlijk",             color: "var(--red)"    },
-  { max: Infinity, label: "Hitteberoerte mogelijk", color: "var(--red)" },
-];
-
-function humidexNiveau(hx) {
-  for (const l of HUMIDEX_SCALE) { if (hx < l.max) return l; }
-  return HUMIDEX_SCALE[HUMIDEX_SCALE.length - 1];
-}
-
-// ── Advies-/SPADO-schalen ──────────────────────────────────────────
-// Eén bron voor de adviesbanners ÉN voor de hero-kleur bovenaan.
-// Per discipline (duur/baan) en per index (wbgt/noaa) eigen clusters.
-// max = bovengrens (exclusief). k = kleur.
-const ADVIES = {
-  duur: {
-    wbgt: [
-      { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          kort:"Koud",        ernst:"groen", tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen.", bericht:"Goed opwarmen voor de start. Let op kwetsbare lopers bij deze lage temperaturen." },
-      { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     kort:"Ideaal",      ernst:"groen", tx:"Beste condities voor duurlopen. Normale vochtinname volstaat.", bericht:"Geen bezwaren voor de training. Normale vochtinname volstaat." },
-      { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         kort:"Verhoogd",    ernst:"geel",  tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw.", bericht:"Training gaat door, maar let extra op je groep: drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten." },
-      { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", kort:"Hoog risico", ernst:"rood",  tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen.", bericht:"Training is aangepast: beperk de duur tot maximaal 1 uur, loop bij voorkeur in de schaduw en bouw extra pauzes in. Lichte kleding en voldoende drinken zijn verplicht." },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", kort:"Afgelasten",  ernst:"zwart", tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden.", bericht:"De waarde is boven de veilige grens. Niet lopen onder deze omstandigheden." },
-    ],
-    noaa: [
-      { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",                  kort:"Laag",        ernst:"groen", tx:"Normaal trainen. Voldoende drinken gedurende de dag.", bericht:"Geen bezwaren voor de training. Voldoende drinken gedurende de dag." },
-      { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", kort:"Middelmatig", ernst:"geel",  tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht.", bericht:"Training gaat door, maar let extra op je groep: drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten." },
-      { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",             kort:"Hoog",        ernst:"geel",  tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw.", bericht:"Wees extra waakzaam op oververhitting. Beperk de intensiteit en duur van de training. Drinkpauze elke 20 min in de schaduw." },
-      { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",       kort:"Zeer hoog",   ernst:"rood",  tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen.", bericht:"Training is aangepast: beperk de duur tot maximaal 1 uur en pas het programma aan (ochtend/avond lopen, inkorten, lichte kleding, extra pauzes, drinken meenemen, schaduw zoeken)." },
-      { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",   kort:"Afgelasten",  ernst:"zwart", tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten.", bericht:"De waarde is boven de veilige grens. Training uitstellen of afgelasten." },
-    ],
-  },
-  baan: {
-    wbgt: [
-      { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        ernst:"groen", tx:"Alle baanonderdelen normaal. Reguliere hydratatie.", bericht:"" },
-      { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 kort:"Matig",       ernst:"geel",  tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk.", bericht:"" },
-      { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             kort:"Verhoogd",    ernst:"geel",  tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels.", bericht:"" },
-      { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     kort:"Hoog risico", ernst:"rood",  tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten.", bericht:"" },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         kort:"Afgelasten",  ernst:"zwart", tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten.", bericht:"" },
-    ],
-    noaa: [
-      { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        ernst:"groen", tx:"Alle baanonderdelen normaal. Reguliere hydratatie.", bericht:"" },
-      { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              kort:"Matig",       ernst:"geel",  tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes.", bericht:"" },
-      { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            kort:"Hoog",        ernst:"rood",  tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten.", bericht:"" },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            kort:"Afgelasten",  ernst:"zwart", tx:"Afgelasten of verplaatsen naar koeler moment.", bericht:"" },
-    ],
-  },
-};
-
-// Ondertekening per discipline
-const ONDERTEKENING = {
-  duur: "— Coördinator wegatletiek SPADO",
-  baan: "— Coördinator baanatletiek SPADO",
-};
-
-// Bouw één coördinatorbericht volgens een vaste structuur, zodat alle
-// niveaus, indexen en disciplines dezelfde opmaak hebben.
-function maakBericht(niveau, indexNaam, waarde, discipline, dagStr) {
-  // Baan heeft nog geen eigen berichttekst: val terug op de duur-tekst
-  // van hetzelfde niveau zodat er altijd iets staat.
-  let instructie = niveau.bericht;
-  if (!instructie) {
-    const idx = indexNaam.includes("NOAA") ? "noaa" : "wbgt";
-    const terug = ADVIES.duur[idx].find(x => x.kort === niveau.kort);
-    instructie = terug ? terug.bericht : niveau.tx;
-  }
-
-  const afsluiting = {
-    groen: "Fijne training!",
-    geel:  "Informeer jullie groepen alstublieft.",
-    rood:  "Informeer jullie groepen alstublieft.",
-    zwart: `De training van ${dagStr} gaat niet door. Informeer jullie groepen alstublieft.`,
-  }[niveau.ernst] || "";
-
-  return [
-    "Beste trainers,",
-    "",
-    `${indexNaam} is momenteel ${waarde} °C — niveau: ${niveau.kort.toLowerCase()}.`,
-    "",
-    instructie,
-    "",
-    afsluiting,
-    "",
-    ONDERTEKENING[discipline] || ONDERTEKENING.duur,
-  ].join("\n");
-}
-
-function actieveDiscipline() {
-  return document.getElementById("tab-baan")?.classList.contains("active") ? "baan" : "duur";
-}
-
-// Kies de juiste adviestabel en het niveau voor een waarde.
-function adviesNiveau(waarde, keuze, discipline) {
-  const idx = keuze === "humidex" ? "noaa" : "wbgt";
-  const tabel = ADVIES[discipline]?.[idx] || ADVIES.duur.wbgt;
-  if (waarde === null || waarde === undefined || Number.isNaN(waarde)) {
-    return { k:"var(--muted)", kort:"—", t:"—", tx:"", i:"" };
-  }
-  return tabel.find(x => waarde < x.max) || tabel[tabel.length - 1];
-}
-
-// Zet een CSS var-string ("var(--red)") om naar de echte hexwaarde,
-// zodat we ook een doorzichtige badge-achtergrond kunnen maken.
-function cssVarNaarHex(kleur) {
-  const m = String(kleur).match(/var\((--[\w-]+)\)/);
-  if (!m) return kleur;
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(m[1]).trim() || kleur;
-}
-
-function hexNaarRgba(hex, alpha) {
-  const h = hex.replace("#", "");
-  const full = h.length === 3 ? h.split("").map(c => c + c).join("") : h;
-  const r = parseInt(full.slice(0,2),16), g = parseInt(full.slice(2,4),16), b = parseInt(full.slice(4,6),16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
-// Eén bron voor de kleur + sportlabel + badge-achtergrond, op basis van
-// de gekozen index. WBGT volgt HK_SCALE, humidex volgt HUMIDEX_SCALE.
-function niveauVoor(waarde, keuze) {
-  if (waarde === null || waarde === undefined || Number.isNaN(waarde)) {
-    return { kleur: "var(--muted)", label: "—", sport: "—", bg: "transparent" };
-  }
-  if (keuze === "humidex") {
-    const n = humidexNiveau(waarde);
-    const hex = cssVarNaarHex(n.color);
-    const sport = waarde < 25 ? "Laag" : waarde < 30 ? "Verhoogd"
-                : waarde < 35 ? "Hoog risico" : "Afgelasten";
-    return { kleur: n.color, label: n.label, sport, bg: hexNaarRgba(hex, 0.15) };
-  }
-  // WBGT
-  const hk = calcHK(waarde);
-  const l = HK_SCALE[hk];
-  const sport = waarde < 18 ? "Ideaal" : waarde < 23 ? "Verhoogd"
-              : waarde < 28 ? "Hoog risico" : "Afgelasten";
-  return { kleur: l.color, label: l.label, sport, bg: hexNaarRgba(l.color, 0.15) };
-}
-
 // ── Schaal renderen ───────────────────────────────────────────────
 function renderScale(activeHK = -1) {
   const grid = document.getElementById("scale-grid");
@@ -1138,13 +951,10 @@ function renderPips(activeHK = -1) {
   const bar = document.getElementById("hk-bar");
   if (!bar) return;
   bar.innerHTML = "";
-  // Verloop: elke actieve pip krijgt zijn EIGEN HK-kleur (blauw -> rood),
-  // inactieve pips blijven subtiel (via .hk-pip opacity in CSS).
   HK_SCALE.forEach(({ hk, color }) => {
     const pip = document.createElement("div");
-    const actief = hk <= activeHK;
-    pip.className = "hk-pip" + (actief ? " actief" : "");
-    pip.style.background = actief ? color : "var(--border)";
+    pip.className = "hk-pip";
+    pip.style.background = hk <= activeHK ? color : "var(--border)";
     bar.appendChild(pip);
   });
 }
@@ -1272,17 +1082,6 @@ function setTab(tab) {
   document.getElementById("panel-baan").style.display = tab === "baan" ? "block" : "none";
   document.getElementById("tab-duur").classList.toggle("active", tab === "duur");
   document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
-
-  // Hero-getallen volgen de actieve discipline: herkleuren
-  const w = window._laatsteWaarden;
-  if (w) {
-    const heroW = document.getElementById("wbgt-out");
-    if (heroW) heroW.style.color = adviesNiveau(w.wbgt, "wbgt", tab).k;
-    const heroH = document.getElementById("humidex-out");
-    if (heroH) heroH.style.color = adviesNiveau(w.humidex, "humidex", tab).k;
-  }
-  // Forecast-tegels en niveaubadge volgen ook de discipline
-  if (window._lastVoorspelling) renderVoorspelling(window._lastVoorspelling);
 }
 
 // ── Advies updaten ────────────────────────────────────────────────
@@ -1297,24 +1096,38 @@ function updateAdvies(indexWaarde) {
   tonen("bron-baan-wbgt",  !isNoaa); tonen("bron-baan-noaa",  isNoaa);
 
   const markeer = (cls, w) => document.querySelectorAll("."+cls).forEach(r => {
-    const actief = w >= parseFloat(r.dataset.min??0) && w < parseFloat(r.dataset.max??999);
-    r.classList.toggle("actief-rij", actief);
-    if (actief) {
-      // Lees de niveaukleur uit het gekleurde vierkantje in de eerste cel
-      const swatch = r.querySelector("td:first-child div");
-      const kleur = swatch ? (swatch.style.background || swatch.style.backgroundColor) : "";
-      if (kleur) r.style.setProperty("--rij-kleur", kleur);
-    } else {
-      r.style.removeProperty("--rij-kleur");
-    }
+    r.classList.toggle("actief-rij", w >= parseFloat(r.dataset.min??0) && w < parseFloat(r.dataset.max??999));
   });
 
   if (isNoaa) { markeer("hk-row-noaa", indexWaarde); markeer("hk-row-baan-noaa", indexWaarde); }
   else        { markeer("hk-row",      indexWaarde); markeer("hk-row-baan",      indexWaarde); }
 
-  const discipline = isNoaa ? "noaa" : "wbgt";
-  const duurN = ADVIES.duur[discipline];
-  const baanN = ADVIES.baan[discipline];
+  const duurN = isNoaa ? [
+    { max:18,  k:"#4fc3f7", i:"✅", t:"Laag — normaal trainen",              tx:"Normaal trainen. Voldoende drinken gedurende de dag." },
+    { max:21,  k:"#29b6f6", i:"ℹ️", t:"Middelmatig — let op kwetsbare sporters", tx:"Bij lange afstanden kunnen warmteaandoeningen optreden. Drinkpauzes verplicht." },
+    { max:26,  k:"#ffd166", i:"⚠️", t:"Hoog — intensiteit beperken",         tx:"Wees extra waakzaam op oververhitting. Beperk intensiteit en duur. Pauze elke 20 min in schaduw." },
+    { max:28,  k:"#ffa726", i:"🚨", t:"Zeer hoog — Wegcoördinator beslist",   tx:"Beperk duur tot 1 uur. Aanpassingen: ochtend/avond lopen · inkorten · lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
+    { max:999, k:"#ef5350", i:"🛑", t:"Afgelasten — Wegcoördinator gelast af",tx:"Sterk afgeraden te gaan sporten. Training uitstellen of afgelasten." },
+  ] : [
+    { max:10,  k:"#90caf9", i:"❄️", t:"Koud — let op onderkoeling",          tx:"Opwarmen verplicht. Let op kwetsbare lopers bij lage temperaturen." },
+    { max:18,  k:"#2d8a4e", i:"✅", t:"Ideaal — optimale omstandigheden",     tx:"Beste condities voor duurlopen. Normale vochtinname volstaat." },
+    { max:23,  k:"#e8c840", i:"ℹ️", t:"Verhoogd — extra maatregelen",         tx:"Extra drinken. Let op beginners en kwetsbare lopers. Pauze elke 20 min in de schaduw." },
+    { max:28,  k:"#d94f3d", i:"🚨", t:"Hoog risico — Wegcoördinator beslist", tx:"Beperk duur tot 1 uur. Lichte kleding · meer pauzes · drinken meenemen · schaduw/bos · hoofd en nek beschermen." },
+    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — KNAU / ACSM zwarte vlag", tx:"Wegcoördinator gelast af. Niet lopen onder deze omstandigheden." },
+  ];
+
+  const baanN = isNoaa ? [
+    { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+    { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes." },
+    { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten." },
+    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            tx:"Afgelasten of verplaatsen naar koeler moment." },
+  ] : [
+    { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
+    { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
+    { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
+    { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
+    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten." },
+  ];
 
   function setBanner(pfx, niveaus, w) {
     const n = niveaus.find(x => w < x.max) || niveaus[niveaus.length-1];
@@ -1340,12 +1153,70 @@ function stuurWhatsApp() {
   const waarde  = isNoaa ? noaa : wbgt;
   const indexNm = isNoaa ? "Gevoelstemp. (NOAA)" : "WBGT";
   const dagStr  = new Date().toLocaleDateString("nl-NL", { weekday:"long", day:"numeric", month:"long" });
-  const disc    = actieveDiscipline();
 
-  const niveau  = adviesNiveau(actief, keuze, disc);
-  const tekst   = maakBericht(niveau, indexNm, waarde, disc, dagStr);
+  let tekst;
 
-  window.open("https://wa.me/?text=" + encodeURIComponent(tekst), "_blank");
+  if (isNoaa) {
+    // NOAA drempels: <18 Laag, 18-21 Middelmatig, 21-26 Hoog, 26-28 Zeer hoog, >28 Afgelasten
+    if (actief < 18) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C — geen bezwaren voor de training vanavond.\n\n` +
+        `Fijne training!\n— Coördinator wegatletiek SPADO`;
+    } else if (actief < 21) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: middelmatig).\n\n` +
+        `Training gaat door maar let extra op je groep: zorg voor drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else if (actief < 26) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: hoog).\n\n` +
+        `Wees extra waakzaam op oververhitting. Beperk de intensiteit en duur van de training. Drinkpauze elke 20 min in de schaduw.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else if (actief < 28) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: zeer hoog).\n\n` +
+        `Training is aangepast: beperk de duur tot maximaal 1 uur en pas het programma aan. Informeer jullie groepen alstublieft.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else {
+      tekst =
+        `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
+        `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
+    }
+  } else {
+    // WBGT drempels: <18 Ideaal, 18-23 Verhoogd, 23-28 Hoog risico, >28 Afgelasten
+    if (actief < 18) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C — geen bezwaren voor de training vanavond.\n\n` +
+        `Fijne training!\n— Coördinator wegatletiek SPADO`;
+    } else if (actief < 23) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: verhoogd).\n\n` +
+        `Training gaat door maar let extra op je groep: zorg voor drinkpauzes elke 20 min in de schaduw en houd kwetsbare lopers in de gaten.\n\n` +
+        `— Coördinator wegatletiek SPADO`;
+    } else if (actief < 28) {
+      tekst =
+        `Beste trainers, de ${indexNm} is momenteel ${waarde} °C (niveau: hoog risico).\n\n` +
+        `Training is aangepast: beperk de duur tot maximaal 1 uur, loop bij voorkeur in de schaduw en bouw extra pauzes in. Lichte kleding en voldoende drinken zijn verplicht.\n\n` +
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
+    } else {
+      tekst =
+        `Beste trainers, op basis van het hitteprotocol gaat de training van ${dagStr} niet door.\n\n` +
+        `De ${indexNm} is momenteel ${waarde} °C — dit is boven de veilige grens van 28 °C.\n\n` +
+        `Informeer jullie groepen alstublieft.\n— Coördinator wegatletiek SPADO`;
+    }
+  }
+
+  // iOS webapp fix: gebruik tijdelijke <a> in plaats van window.open
+  // zodat de webapp niet wordt vervangen door een nieuwe tab
+  const waUrl = "https://wa.me/?text=" + encodeURIComponent(tekst);
+  const a = document.createElement("a");
+  a.href = waUrl;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 
@@ -1370,9 +1241,11 @@ function verwerkData(data) {
   const hk       = calcHK(wbgt);
   const hkLevel  = HK_SCALE[hk];
   const humidex  = berekenHumidex(ta, rh);
-  const hxNiveau = humidexNiveau(humidex);
-  const hxKleur  = hxNiveau.color;
-  const hxRisico = hxNiveau.label;
+  const hxKleur  = humidex < 25 ? "var(--green)" : humidex < 35 ? "var(--yellow)" :
+                   humidex < 40 ? "var(--orange)" : "var(--red)";
+  const hxRisico = humidex < 20 ? "Geen ongemak" : humidex < 25 ? "Licht ongemak" :
+                   humidex < 30 ? "Merkbaar ongemak" : humidex < 35 ? "Aanzienlijk ongemak" :
+                   humidex < 40 ? "Groot ongemak" : humidex < 45 ? "Gevaarlijk" : "Hitteberoerte mogelijk";
 
   set("c-tw", tw); set("c-tg", tg); set("c-wbgt", wbgt);
   set("c-wbgt-in", wbgt_in); set("c-hk", hk, 0); set("c-humidex", humidex);
@@ -1383,18 +1256,15 @@ function verwerkData(data) {
   // Hero waarden
   const heroW = document.getElementById("wbgt-out");
   heroW.innerHTML = `${wbgt.toFixed(1)}<span class="wbgt-unit">°C</span>`;
-  heroW.style.color = adviesNiveau(wbgt, "wbgt", actieveDiscipline()).k;
+  heroW.style.color = hkLevel.color;
   heroW.classList.remove("fresh"); void heroW.offsetWidth; heroW.classList.add("fresh");
 
   const heroH = document.getElementById("humidex-out");
   if (heroH) {
     heroH.innerHTML = `${humidex.toFixed(1)}<span class="wbgt-unit">°C</span>`;
-    heroH.style.color = adviesNiveau(humidex, "humidex", actieveDiscipline()).k;
+    heroH.style.color = hxKleur;
     heroH.classList.remove("fresh"); void heroH.offsetWidth; heroH.classList.add("fresh");
   }
-
-  // Bewaar voor herkleuren bij tabwissel
-  window._laatsteWaarden = { wbgt, humidex };
 
   // Meettijd
   const nu10 = new Date();
@@ -1457,9 +1327,15 @@ function renderVoorspelling(uren) {
     const hx_u   = ta_u !== null ? berekenHumidex(ta_u, rh_act) : null;
     const actief_u = keuze === "humidex" ? hx_u : wbgt_u;
 
-    const n = adviesNiveau(actief_u, keuze, actieveDiscipline());
-    const kleur = n.k;
-    const niveauLabel = n.kort;
+    const kleur = actief_u === null ? "var(--muted)" :
+      actief_u < 18 ? "#2d8a4e" :
+      actief_u < 23 ? "#e8c840" :
+      actief_u < 28 ? "#d94f3d" : "#b71c1c";
+
+    const niveauLabel = actief_u === null ? "—" :
+      actief_u < 18 ? (keuze === "humidex" ? "Laag" : "Ideaal") :
+      actief_u < 23 ? "Verhoogd" :
+      actief_u < 28 ? "Hoog risico" : "Afgelasten";
 
     const tijdStr  = u.uur || "—";
     const regenStr = regen_u > 0 ? ` · 🌧 ${regen_u}mm` : "";
@@ -1479,20 +1355,41 @@ function renderVoorspelling(uren) {
 }
 
 function updateNiveauBadge(actief, keuzeOverride) {
-  const keuze = keuzeOverride || document.getElementById("index-keuze")?.value || "wbgt";
+  const keuze  = keuzeOverride || document.getElementById("index-keuze")?.value || "wbgt";
+  const isNoaa = keuze === "humidex";
 
-  const n = adviesNiveau(actief, keuze, actieveDiscipline());
-  const badgeBg = n.k && n.k.startsWith("#") ? hexNaarRgba(n.k, 0.15) : "transparent";
+  const niveaus = isNoaa ? [
+    { max:18,  label:"Laag",        kleur:"#4fc3f7", bg:"rgba(79,195,247,0.15)" },
+    { max:21,  label:"Middelmatig", kleur:"#29b6f6", bg:"rgba(41,182,246,0.15)" },
+    { max:26,  label:"Hoog",        kleur:"#ffd166", bg:"rgba(255,209,102,0.15)"},
+    { max:28,  label:"Zeer hoog",   kleur:"#ffa726", bg:"rgba(255,167,38,0.15)" },
+    { max:999, label:"Afgelasten",  kleur:"#ef5350", bg:"rgba(239,83,80,0.15)"  },
+  ] : [
+    { max:10,  label:"Koud",        kleur:"#90caf9", bg:"rgba(144,202,249,0.15)"},
+    { max:18,  label:"Ideaal",      kleur:"#2d8a4e", bg:"rgba(45,138,78,0.15)"  },
+    { max:23,  label:"Verhoogd",    kleur:"#e8c840", bg:"rgba(232,200,64,0.15)" },
+    { max:28,  label:"Hoog risico", kleur:"#d94f3d", bg:"rgba(217,79,61,0.15)"  },
+    { max:999, label:"Afgelasten",  kleur:"#b71c1c", bg:"rgba(183,28,28,0.15)"  },
+  ];
+
+  const n = niveaus.find(x => actief < x.max) || niveaus[niveaus.length-1];
 
   // WhatsApp knop badge
   const waBadge = document.getElementById("wa-niveau-badge");
   if (waBadge) {
-    waBadge.textContent = n.kort;
-    waBadge.style.color = n.k;
-    waBadge.style.background = badgeBg;
+    waBadge.textContent = n.label;
+    waBadge.style.color = n.kleur;
+    waBadge.style.background = n.bg;
     waBadge.style.display = "inline-block";
   }
-  // Knoptekst blijft vast op "Stuur bericht" (zie HTML); alleen de badge toont de ernst.
+
+  // Knoptekst aanpassen
+  const btnTekst = document.getElementById("wa-btn-tekst");
+  if (btnTekst) {
+    btnTekst.textContent = actief >= 28 ? "Stuur afgelasting" :
+                           actief >= 23 ? "Stuur aanpassing" :
+                           actief >= 18 ? "Stuur waarschuwing" : "Stuur update";
+  }
 }
 
 // ── KNMI data ophalen ─────────────────────────────────────────────
