@@ -575,7 +575,7 @@
       <!-- Gevuld via JavaScript -->
     </div>
     <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
-      Voorspelling via Open-Meteo · Temperatuur, RH en straling per uur · WBGT via Liljegren / Stull · Gevoelstemp. via SPADO Humidex-tabel
+      Voorspelling via Open-Meteo · WBGT via Liljegren / Stull · Gevoelstemp. via SPADO Humidex-tabel (geldig 20–35°C)
     </div>
   </div>
 
@@ -1364,7 +1364,7 @@ function verwerkData(data) {
 
   const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
   const wbgt_in  = wbgtBinnen(ta, rh);
-  const hk       = calcHK(wbgt);
+  const hk       = isNaN(wbgt) ? 0 : calcHK(wbgt);
   const hkLevel  = HK_SCALE[hk];
   const hxTab    = humidexUitTabel(ta, rh);
   const humidex  = hxTab.waarde;
@@ -1403,7 +1403,7 @@ function verwerkData(data) {
   nu10.setSeconds(0,0); nu10.setMinutes(Math.floor(nu10.getMinutes()/10)*10);
   const meetStr = nu10.toLocaleTimeString("nl-NL", { hour:"2-digit", minute:"2-digit" });
   const el_time = document.getElementById("wbgt-time");
-  if (el_time) el_time.textContent = `WBGT ${wbgt.toFixed(1)} · Gevoelstemp. ${humidex.toFixed(1)} · ca. ${meetStr}`;
+  if (el_time) el_time.textContent = `WBGT ${wbgt.toFixed(1)} · Gevoelstemp. ${hxTab.tekst === "buiten tabel" ? "—" : hxTab.tekst} · ca. ${meetStr}`;
 
   // Hittekracht
   const hkNum  = document.getElementById("hk-num");
@@ -1474,11 +1474,16 @@ function renderVoorspelling(uren) {
     const regenStr = regen_u > 0 ? ` · 🌧 ${regen_u}mm` : "";
     const rhStr    = rh_act ? ` · ${Math.round(rh_act)}%` : "";
 
+    // Toon "buiten tabel" netjes als streepje
+    const waardeTekst_u = keuze === "humidex"
+      ? (hxTab_u.tekst === "buiten tabel" ? "—" : hxTab_u.tekst)
+      : (wbgt_u !== null ? wbgt_u.toFixed(1) : "—");
+
     const el = document.createElement("div");
     el.className = "fc-uur";
     el.innerHTML = `
       <div class="fc-tijd">${tijdStr}</div>
-      <div class="fc-wbgt" style="color:${kleur};">${actief_u !== null ? actief_u.toFixed(1) : "—"}<span class="fc-unit">°C</span></div>
+      <div class="fc-wbgt" style="color:${kleur};">${waardeTekst_u}<span class="fc-unit">${keuze === "humidex" && hxTab_u.tekst === "buiten tabel" ? "" : "°C"}</span></div>
       <div class="fc-ta" style="color:var(--muted);">${ta_u !== null ? ta_u.toFixed(1)+"°C" : "—"}${rhStr}${regenStr}</div>
       <div class="fc-balk" style="background:${kleur};opacity:0.5;"></div>
       <div class="fc-niveau" style="color:${kleur};">${niveauLabel}</div>
