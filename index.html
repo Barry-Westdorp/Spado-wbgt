@@ -575,7 +575,7 @@
       <!-- Gevuld via JavaScript -->
     </div>
     <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
-      Voorspelling via Open-Meteo · WBGT via Liljegren / Stull · Gevoelstemp. via SPADO Humidex-tabel (geldig 20–35°C)
+      Voorspelling via Open-Meteo · WBGT berekend via Liljegren / Stull · Gevoelstemp. via SPADO Humidex-tabel (geldig 20–35°C)
     </div>
   </div>
 
@@ -1449,7 +1449,7 @@ function renderVoorspelling(uren) {
     const q_u    = u.q || 0;
     const regen_u= u.neerslag || 0;
 
-    // Gebruik uur-RH van Open-Meteo indien beschikbaar, anders actuele RH
+    // Gebruik uur-RH van Open-Meteo voorspelling indien beschikbaar, anders actuele RH
     const rh_act = u.rh !== null && u.rh !== undefined
       ? u.rh
       : (parseFloat(document.getElementById("v-rh")?.textContent) || 60);
@@ -1511,13 +1511,13 @@ async function fetchKNMI() {
   window._lastFetch = Date.now();
   const btn = document.getElementById("update-btn");
   btn.disabled = true; btn.classList.add("loading");
-  setStatus("Data ophalen van Weerlive · Woensdrecht…");
+  setStatus("Data ophalen van KNMI · Woensdrecht…");
   try {
     const resp = await fetch(`${WORKER_URL}/wbgt`);
     const data = await resp.json();
     if (!resp.ok || data.error) throw new Error(data.error || `HTTP ${resp.status}`);
     verwerkData(data);
-    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · ${data.bron || "Weerlive.nl · KNMI-data"}`, "ok");
+    setStatus(`✓ Geladen om ${new Date().toLocaleTimeString("nl-NL")} · ${data.bron || "KNMI Open Data EDR API"}`, "ok");
   } catch (err) {
     setStatus(`⚠ Fout: ${err.message}`, "error");
     console.error(err);
