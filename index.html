@@ -1037,12 +1037,16 @@ const ONDERTEKENING = {
 function maakBericht(niveau, indexNaam, waarde, discipline, dagStr) {
   // Baan heeft nog geen eigen berichttekst: val terug op de duur-tekst
   // van hetzelfde niveau zodat er altijd iets staat.
+  const isWbgt = indexNaam.includes("WBGT");
   let instructie = niveau.bericht;
   if (!instructie) {
-    const idx = indexNaam.includes("WBGT") ? "wbgt" : "noaa";
+    const idx = isWbgt ? "wbgt" : "noaa";
     const terug = ADVIES.duur[idx].find(x => x.kort === niveau.kort);
     instructie = terug ? terug.bericht : niveau.tx;
   }
+
+  // Coördinatoren communiceren een indexcijfer (geen temperatuur).
+  const indexLabel = isWbgt ? "De WBGT-index" : "De Humidex-index";
 
   const afsluiting = {
     groen: "Fijne training!",
@@ -1054,7 +1058,7 @@ function maakBericht(niveau, indexNaam, waarde, discipline, dagStr) {
   return [
     "Beste trainers,",
     "",
-    `${indexNaam} is momenteel ${waarde} °C — niveau: ${niveau.kort.toLowerCase()}.`,
+    `${indexLabel} is momenteel ${waarde} — niveau: ${niveau.kort.toLowerCase()}.`,
     "",
     instructie,
     "",
