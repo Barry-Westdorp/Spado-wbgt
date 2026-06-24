@@ -47,6 +47,9 @@
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 28px 32px 24px;
+    padding-top: calc(28px + env(safe-area-inset-top, 0px));
+    padding-left: calc(32px + env(safe-area-inset-left, 0px));
+    padding-right: calc(32px + env(safe-area-inset-right, 0px));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -567,6 +570,7 @@
       </div>
 
     </div>
+  </div>
 
   <!-- Voorspelling komende 6 uur -->
   <div class="card scale-full" id="forecast-card" style="display:none;">
@@ -1158,21 +1162,6 @@ function hexNaarRgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function niveauVoor(waarde, keuze) {
-  if (waarde === null || waarde === undefined || Number.isNaN(waarde)) {
-    return { kleur: "var(--muted)", label: "—", sport: "—", bg: "transparent" };
-  }
-  if (keuze === "humidex") {
-    const n = humidexNiveau(waarde);
-    const hex = cssVarNaarHex(n.color);
-    const sport = waarde < 25 ? "Laag" : waarde < 30 ? "Verhoogd" : waarde < 35 ? "Hoog risico" : "Afgelasten";
-    return { kleur: n.color, label: n.label, sport, bg: hexNaarRgba(hex, 0.15) };
-  }
-  const hk = calcHK(waarde);
-  const l = HK_SCALE[hk];
-  const sport = waarde < 18 ? "Ideaal" : waarde < 23 ? "Verhoogd" : waarde < 28 ? "Hoog risico" : "Afgelasten";
-  return { kleur: l.color, label: l.label, sport, bg: hexNaarRgba(l.color, 0.15) };
-}
 
 // ── Index keuze schakelaar ────────────────────────────────────────
 function setIndexKeuze(keuze) {
