@@ -17,8 +17,16 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
+    --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-body: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  /* ── Donker thema (standaard) ────────────────────────────── */
+  :root, [data-theme="dark"] {
     --bg:        #0b0b16;
     --surface:   #13132a;
+    --header-bg: #13132a;
+    --header-text: #ffffff;
     --card:      #1a1a35;
     --border:    #2a2a50;
     --accent:    #6c63ff;
@@ -30,8 +38,44 @@
     --red:       #ff4757;
     --white:     #ffffff;
     --muted:     #8890b0;
-    --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-    --font-body: 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  /* ── Licht thema ─────────────────────────────────────────── */
+  [data-theme="light"] {
+    --bg:        #f0ede8;
+    --surface:   #ffffff;
+    --header-bg: #4A5A8B;
+    --header-text: #ffffff;
+    --card:      #ffffff;
+    --border:    #ddd8d0;
+    --accent:    #4A5A8B;
+    --cyan:      #4A5A8B;
+    --coral:     #8B1A2B;
+    --green:     #3B6D11;
+    --yellow:    #BA7517;
+    --orange:    #993C1D;
+    --red:       #A32D2D;
+    --white:     #1a1a1a;
+    --muted:     #666666;
+  }
+
+  /* Systeem voorkeur als geen handmatige keuze */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      --bg:        #f0ede8;
+      --surface:   #ffffff;
+      --card:      #ffffff;
+      --border:    #ddd8d0;
+      --accent:    #4A5A8B;
+      --cyan:      #4A5A8B;
+      --coral:     #8B1A2B;
+      --green:     #3B6D11;
+      --yellow:    #BA7517;
+      --orange:    #993C1D;
+      --red:       #A32D2D;
+      --white:     #1a1a1a;
+      --muted:     #666666;
+    }
   }
 
   body {
@@ -44,7 +88,7 @@
 
   /* ── Header ───────────────────────────────────────────────── */
   header {
-    background: var(--surface);
+    background: var(--header-bg, var(--surface));
     border-bottom: 1px solid var(--border);
     padding: 28px 32px 24px;
     padding-top: calc(28px + env(safe-area-inset-top, 0px));
@@ -65,14 +109,14 @@
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--white);
+    color: var(--header-text, var(--white));
   }
 
-  .header-left h1 span { color: var(--cyan); }
+  .header-left h1 span { color: var(--header-text, var(--cyan)); }
 
   .header-left .subtitle {
     font-size: 0.78rem;
-    color: var(--muted);
+    color: rgba(255,255,255,0.65);
     margin-top: 4px;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -207,8 +251,12 @@
   /* ── Hero WBGT display ────────────────────────────────────── */
   .hero-card {
     grid-column: 1 / -1;
-    background: linear-gradient(135deg, #1a1a35 0%, #0f0f28 100%);
+    background: var(--card);
     border-color: var(--accent);
+  }
+
+  [data-theme="dark"] .hero-card {
+    background: linear-gradient(135deg, #1a1a35 0%, #0f0f28 100%);
   }
 
   .wbgt-main { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -505,11 +553,19 @@
     <h1>🌡 WBGT · <span>Woensdrecht</span></h1>
     <div class="subtitle">KNMI Hittekracht · ISO 7243 · Station 06340</div>
   </div>
-  <button id="update-btn" onclick="fetchKNMI()">
-    <span class="btn-icon">↻</span>
-    <span class="spinner"></span>
-    Vernieuwen
-  </button>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button id="theme-btn" onclick="toggleTheme()" title="Wissel thema"
+      style="background:var(--surface);border:1px solid var(--border);color:var(--muted);
+             padding:11px 14px;border-radius:8px;font-size:1rem;cursor:pointer;
+             transition:background 0.2s;font-family:var(--font-body);">
+      ☀️
+    </button>
+    <button id="update-btn" onclick="fetchKNMI()">
+      <span class="btn-icon">↻</span>
+      <span class="spinner"></span>
+      Vernieuwen
+    </button>
+  </div>
 </header>
 
 <div id="status-bar">Klik op Vernieuwen om actuele data van KNMI te laden.</div>
@@ -931,6 +987,27 @@
 </footer>
 
 <script>
+// ── Thema ────────────────────────────────────────────────────────
+function toggleTheme() {
+  const huidig = document.documentElement.getAttribute("data-theme");
+  const nieuw  = huidig === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", nieuw);
+  document.getElementById("theme-btn").textContent = nieuw === "light" ? "🌙" : "☀️";
+  localStorage.setItem("spado-thema", nieuw);
+}
+
+// Herstel thema bij laden
+(function() {
+  const opgeslagen = localStorage.getItem("spado-thema");
+  if (opgeslagen) {
+    document.documentElement.setAttribute("data-theme", opgeslagen);
+  } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+    document.documentElement.setAttribute("data-theme", "light");
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+})();
+
 // ── Configuratie ─────────────────────────────────────────────────
 const WORKER_URL   = "https://knmi-proxy-v2.barry-f41.workers.dev";
 const STATION_NR   = 6340;
@@ -1543,7 +1620,13 @@ function startRefresh() {
   refreshInterval = setInterval(fetchKNMI, 10 * 60 * 1000);
 }
 
-window.addEventListener("load", startRefresh);
+window.addEventListener("load", () => {
+  startRefresh();
+  // Zet juist icoon op de thema-knop
+  const thema = document.documentElement.getAttribute("data-theme") || "dark";
+  const btn = document.getElementById("theme-btn");
+  if (btn) btn.textContent = thema === "light" ? "🌙" : "☀️";
+});
 
 // Vernieuw direct als app weer op voorgrond komt (iOS webapp fix)
 document.addEventListener("visibilitychange", () => {
