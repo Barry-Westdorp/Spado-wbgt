@@ -831,8 +831,9 @@
         <table class="advies-tabel">
           <thead>
             <tr>
-              <th style="width:20px;"></th>
-              <th>WBGT</th>
+              <th style="width:16px;"></th>
+              <th style="white-space:nowrap;">WBGT</th>
+              <th style="white-space:nowrap;">HK</th>
               <th>Niveau</th>
               <th id="baan-col-header">Sprint / Horden / Technisch</th>
             </tr>
@@ -840,37 +841,43 @@
           <tbody id="tabel-baan-wbgt">
             <tr class="hk-row-baan" data-min="0" data-max="18.4">
               <td><div style="width:12px;height:18px;background:#2d8a4e;border-radius:2px;"></div></td>
-              <td>&lt; 18.3 °C · HK 0–2</td>
+              <td style="white-space:nowrap;">&lt; 18.3 °C</td>
+              <td style="white-space:nowrap;color:var(--muted);font-size:0.82rem;">0–2</td>
               <td style="color:#2d8a4e;">Veilig</td>
               <td>Normale sportactiviteit. Reguliere hydratatie.</td>
             </tr>
             <tr class="hk-row-baan" data-min="18.4" data-max="22.3">
               <td><div style="width:12px;height:18px;background:#e8c840;border-radius:2px;"></div></td>
-              <td>18.4 – 22.2 °C · HK 3–4</td>
+              <td style="white-space:nowrap;">18.4–22.2 °C</td>
+              <td style="white-space:nowrap;color:var(--muted);font-size:0.82rem;">3–4</td>
               <td style="color:#7a6200;">Verhoogd</td>
               <td>Verhoog rust/arbeid verhouding. Controleer vochtinname. Kwetsbare sporters extra observeren.</td>
             </tr>
             <tr class="hk-row-baan" data-min="22.3" data-max="25.7">
               <td><div style="width:12px;height:18px;background:#ef9f27;border-radius:2px;"></div></td>
-              <td>22.3 – 25.6 °C · HK 5–6</td>
+              <td style="white-space:nowrap;">22.3–25.6 °C</td>
+              <td style="white-space:nowrap;color:var(--muted);font-size:0.82rem;">5–6</td>
               <td style="color:#854f0b;">Hoog</td>
               <td>Verhoog rust/arbeid verhouding. Verminder totale belastingsduur. Geacclimatiseerde sporters: controleer drank.</td>
             </tr>
             <tr class="hk-row-baan" data-min="25.7" data-max="27.9">
               <td><div style="width:12px;height:18px;background:#d94f3d;border-radius:2px;"></div></td>
-              <td>25.7 – 27.8 °C · HK 7</td>
+              <td style="white-space:nowrap;">25.7–27.8 °C</td>
+              <td style="white-space:nowrap;color:var(--muted);font-size:0.82rem;">7</td>
               <td style="color:#d94f3d;">Hoog risico</td>
               <td>Verhoog rust, verminder belastingintensiteit en -duur. Koeling verplicht. Intensieve series beperken.</td>
             </tr>
             <tr class="hk-row-baan" data-min="27.9" data-max="30.1">
               <td><div style="width:12px;height:18px;background:#b71c1c;border-radius:2px;"></div></td>
-              <td>27.9 – 30.0 °C · HK 8</td>
+              <td style="white-space:nowrap;">27.9–30.0 °C</td>
+              <td style="white-space:nowrap;color:var(--muted);font-size:0.82rem;">8</td>
               <td style="color:#b71c1c;">Zeer hoog risico</td>
               <td>Rust/arbeid 1:1. Intensieve oefeningen sterk beperken. Sporters met verhoogd risico nauwkeurig observeren.</td>
             </tr>
             <tr class="hk-row-baan" data-min="30.1" data-max="99">
               <td><div style="width:12px;height:18px;background:#1a1a1a;border-radius:2px;border:1px solid #666;"></div></td>
-              <td>&gt; 30.1 °C · HK 9–10</td>
+              <td style="white-space:nowrap;">&gt; 30.1 °C</td>
+              <td style="white-space:nowrap;color:var(--muted);font-size:0.82rem;">9–10</td>
               <td style="color:var(--red);">Afgelasten</td>
               <td>Training en wedstrijd afgelasten of stoppen. Beperk blootstelling aan hitte voor alle aanwezigen.</td>
             </tr>
@@ -1344,11 +1351,12 @@ function updateAdvies(indexWaarde) {
     { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten." },
     { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            tx:"Afgelasten of verplaatsen naar koeler moment." },
   ] : [
-    { max:18,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               tx:"Alle baanonderdelen normaal. Reguliere hydratatie." },
-    { max:23,  k:"#e8c840", i:"ℹ️", t:"Matig — extra drinken",                 tx:"Extra drinken. Schaduw bij wachten. Sprint en technisch normaal mogelijk." },
-    { max:28,  k:"#ef9f27", i:"⚠️", t:"Verhoogd — rust verlengen",             tx:"Langere rust tussen series. Schaduw verplicht. 800m+ volgt weg-drempels." },
-    { max:31,  k:"#d94f3d", i:"🚨", t:"Hoog risico — essentieel beperken",     tx:"Beperkt tot essentiële series. Rust verdubbelen. Koeling verplicht. Midden-lange afstand afgelasten." },
-    { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten — NSCA zwarte vlag",         tx:"Alle baanonderdelen afgelasten. Gevaar voor alle atleten." },
+    { max:18.4, k:"#2d8a4e", i:"✅", t:"Veilig — normale sportactiviteit",      tx:"Normale sportactiviteit voor alle baanonderdelen. Reguliere hydratatie." },
+    { max:22.3, k:"#e8c840", i:"ℹ️", t:"Verhoogd — rust/arbeid aanpassen",      tx:"Verhoog rust/arbeid verhouding. Controleer vochtinname. Kwetsbare sporters extra observeren." },
+    { max:25.7, k:"#ef9f27", i:"⚠️", t:"Hoog — belastingsduur verminderen",     tx:"Verhoog rust/arbeid verhouding. Verminder totale belastingsduur. Geacclimatiseerde sporters: controleer drank." },
+    { max:27.9, k:"#d94f3d", i:"🚨", t:"Hoog risico — intensiteit beperken",    tx:"Verhoog rust, verminder belastingintensiteit en -duur. Koeling verplicht. Intensieve series beperken." },
+    { max:30.1, k:"#b71c1c", i:"🚨", t:"Zeer hoog risico — rust 1:1",           tx:"Rust/arbeid 1:1. Intensieve oefeningen sterk beperken. Sporters met verhoogd risico nauwkeurig observeren." },
+    { max:999,  k:"#880e0e", i:"🛑", t:"Afgelasten — AU protocol juni 2026",    tx:"Training en wedstrijd afgelasten of stoppen conform Atletiekunie protocol juni 2026." },
   ];
 
   function setBanner(pfx, niveaus, w) {
