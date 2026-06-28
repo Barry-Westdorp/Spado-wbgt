@@ -497,6 +497,72 @@
   .advies-tabel tr:last-child td { border-bottom: none; }
   .advies-tabel tr.actief-rij td { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 
+  /* ── Responsive tabel op mobiel ──────────────────────────── */
+  @media (max-width: 700px) {
+    .advies-tabel thead { display: none; }
+    .advies-tabel tr {
+      display: block;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+    }
+    .advies-tabel tr:last-child { border-bottom: none; }
+    .advies-tabel td {
+      display: block;
+      border-bottom: none;
+      padding: 2px 12px;
+    }
+    .advies-tabel td:first-child {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 8px 8px 2px 12px;
+    }
+    .advies-tabel td:nth-child(2) {
+      display: inline-block;
+      vertical-align: middle;
+      font-weight: 700;
+      padding: 8px 4px 2px 4px;
+      font-size: 0.82rem;
+    }
+    /* Duur tabel: kleur | WBGT | Niveau | Advies */
+    #tabel-duur-wbgt td:nth-child(3),
+    #tabel-duur-noaa td:nth-child(3),
+    #tabel-baan-noaa td:nth-child(3) {
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 2px 12px;
+      display: block;
+    }
+    #tabel-duur-wbgt td:last-child,
+    #tabel-duur-noaa td:last-child,
+    #tabel-baan-noaa td:last-child {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 2px 12px 8px;
+      display: block;
+    }
+
+    /* Baan WBGT tabel: kleur | WBGT | HK | Niveau | Advies */
+    #tabel-baan-wbgt td:nth-child(3) {
+      display: inline-block;
+      vertical-align: middle;
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 8px 8px 2px 2px;
+    }
+    #tabel-baan-wbgt td:nth-child(4) {
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 2px 12px;
+      display: block;
+    }
+    #tabel-baan-wbgt td:last-child {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 2px 12px 8px;
+      display: block;
+    }
+  }
+
   /* ── Index grootte via data-size ───────────────────────── */
   [data-size="groot"] { font-size: 3.4rem !important; }
   [data-size="groot"] .wbgt-unit { font-size: 1.4rem !important; }
