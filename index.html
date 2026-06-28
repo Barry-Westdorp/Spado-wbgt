@@ -660,19 +660,28 @@
         <!-- Meettijd -->
         <div class="wbgt-sub" id="wbgt-time" style="margin-top:6px;">Nog geen meting geladen</div>
 
-        <!-- Schakelaar -->
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
-          <div style="font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Waarschuwing op basis van</div>
-          <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;">
-            <button id="btn-wbgt" onclick="setIndexKeuze('wbgt')"
-              style="padding:7px 16px;border:none;background:var(--accent);color:white;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">WBGT</button>
-            <button id="btn-humidex" onclick="setIndexKeuze('humidex')"
-              style="padding:7px 16px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Humidex</button>
+        <!-- Schakelaars -->
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Discipline</div>
+            <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;">
+              <button id="btn-weg" onclick="setDiscipline('duur')" style="padding:7px 16px;border:none;background:var(--accent);color:white;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Weg</button>
+              <button id="btn-baan" onclick="setDiscipline('baan')" style="padding:7px 16px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Baan</button>
+            </div>
           </div>
-          <div style="font-size:0.7rem;color:var(--muted);"><span id="index-uitleg">ISO 7243 · wind + straling</span></div>
+
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Waarschuwing op basis van</div>
+            <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;">
+              <button id="btn-wbgt" onclick="setIndexKeuze('wbgt')" style="padding:7px 16px;border:none;background:var(--accent);color:white;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">WBGT</button>
+              <button id="btn-humidex" onclick="setIndexKeuze('humidex')" style="padding:7px 16px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Humidex</button>
+            </div>
+            <div style="font-size:0.7rem;color:var(--muted);"><span id="index-uitleg">ISO 7243 · wind + straling</span></div>
+          </div>
+
         </div>
         <input type="hidden" id="index-keuze" value="wbgt">
-
         <!-- WhatsApp -->
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <button onclick="stuurWhatsApp()" id="wa-btn" style="background:#25D366;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;">
@@ -1066,6 +1075,34 @@
 </footer>
 
 <script>
+// ── Discipline schakelaar ────────────────────────────────────────
+function setDiscipline(disc) {
+  // Update hero knoppen
+  const btnWeg  = document.getElementById("btn-weg");
+  const btnBaan = document.getElementById("btn-baan");
+  if (btnWeg && btnBaan) {
+    if (disc === "duur") {
+      btnWeg.style.background  = "var(--accent)"; btnWeg.style.color  = "white";
+      btnBaan.style.background = "transparent";   btnBaan.style.color = "var(--muted)";
+    } else {
+      btnBaan.style.background = "var(--accent)"; btnBaan.style.color = "white";
+      btnWeg.style.background  = "transparent";   btnWeg.style.color  = "var(--muted)";
+    }
+  }
+  // Sync met advies tabs
+  setTab(disc);
+  // Herbereken badge en advies met juiste discipline
+  const w = window._laatsteWaarden;
+  if (w) {
+    const keuze = document.getElementById("index-keuze")?.value || "wbgt";
+    const actief = keuze === "humidex" ? w.humidex : w.wbgt;
+    updateNiveauBadge(actief, keuze);
+  }
+  if (window._lastVoorspelling) renderVoorspelling(window._lastVoorspelling);
+  // Sla op in localStorage
+  localStorage.setItem("spado-discipline", disc);
+}
+
 // ── Thema ────────────────────────────────────────────────────────
 function toggleTheme() {
   const huidig = document.documentElement.getAttribute("data-theme");
@@ -1075,8 +1112,9 @@ function toggleTheme() {
   localStorage.setItem("spado-thema", nieuw);
 }
 
-// Herstel thema bij laden
+// Herstel thema en discipline bij laden
 (function() {
+  // Thema
   const opgeslagen = localStorage.getItem("spado-thema");
   if (opgeslagen) {
     document.documentElement.setAttribute("data-theme", opgeslagen);
@@ -1085,6 +1123,16 @@ function toggleTheme() {
   } else {
     document.documentElement.setAttribute("data-theme", "dark");
   }
+
+  // Discipline via URL /?=baan of /?=weg — heeft prioriteit boven localStorage
+  const urlParam = new URLSearchParams(window.location.search).get("");
+  const opgeslagenDisc = localStorage.getItem("spado-discipline");
+  const discipline = urlParam === "baan" ? "baan"
+                   : urlParam === "weg"  ? "duur"
+                   : opgeslagenDisc      || "duur";
+
+  // Zet discipline zodra DOM geladen is
+  window._startDiscipline = discipline;
 })();
 
 // ── Configuratie ─────────────────────────────────────────────────
@@ -1244,18 +1292,28 @@ const ADVIES = {
   },
   baan: {
     wbgt: [
-      { max:18.4, k:"#2d8a4e", i:"✅", t:"Veilig — normale sportactiviteit",      kort:"Veilig",          ernst:"groen", tx:"Normale sportactiviteit voor alle baanonderdelen. Reguliere hydratatie.", bericht:"" },
-      { max:22.3, k:"#e8c840", i:"ℹ️", t:"Verhoogd — rust/arbeid aanpassen",      kort:"Verhoogd",        ernst:"geel",  tx:"Verhoog rust/arbeid verhouding. Controleer vochtinname. Kwetsbare sporters extra observeren.", bericht:"" },
-      { max:25.7, k:"#ef9f27", i:"⚠️", t:"Hoog — belastingsduur verminderen",     kort:"Hoog",            ernst:"geel",  tx:"Verhoog rust/arbeid verhouding. Verminder totale belastingsduur. Geacclimatiseerde sporters: controleer drank.", bericht:"" },
-      { max:27.9, k:"#d94f3d", i:"🚨", t:"Hoog risico — intensiteit beperken",    kort:"Hoog risico",     ernst:"rood",  tx:"Verhoog rust, verminder belastingintensiteit en -duur. Koeling verplicht. Intensieve series beperken.", bericht:"" },
-      { max:30.1, k:"#b71c1c", i:"🚨", t:"Zeer hoog risico — rust 1:1",           kort:"Zeer hoog risico",ernst:"rood",  tx:"Rust/arbeid 1:1. Intensieve oefeningen sterk beperken. Sporters met verhoogd risico nauwkeurig observeren.", bericht:"" },
-      { max:999,  k:"#880e0e", i:"🛑", t:"Afgelasten — AU protocol",              kort:"Afgelasten",      ernst:"zwart", tx:"Training en wedstrijd afgelasten of stoppen conform Atletiekunie protocol juni 2026.", bericht:"" },
+      { max:18.4, k:"#2d8a4e", i:"✅", t:"Veilig — normale sportactiviteit",      kort:"Veilig",          ernst:"groen", tx:"Normale sportactiviteit voor alle baanonderdelen. Reguliere hydratatie.",
+        bericht:"Geen bezwaren voor de training. Normale sportactiviteit voor alle baanonderdelen. Reguliere hydratatie." },
+      { max:22.3, k:"#e8c840", i:"ℹ️", t:"Verhoogd — rust/arbeid aanpassen",      kort:"Verhoogd",        ernst:"geel",  tx:"Verhoog rust/arbeid verhouding. Controleer vochtinname. Kwetsbare sporters extra observeren.",
+        bericht:"Training gaat door met aanpassingen: verhoog de rust/arbeid verhouding en controleer de vochtinname. Let extra op kwetsbare sporters." },
+      { max:25.7, k:"#ef9f27", i:"⚠️", t:"Hoog — belastingsduur verminderen",     kort:"Hoog",            ernst:"geel",  tx:"Verhoog rust/arbeid verhouding. Verminder totale belastingsduur. Geacclimatiseerde sporters: controleer drank.",
+        bericht:"Training gaat door met aanpassingen: verhoog de rust/arbeid verhouding en verminder de totale belastingsduur. Zorg voor voldoende drinkmomenten en schaduw bij het wachten." },
+      { max:27.9, k:"#d94f3d", i:"🚨", t:"Hoog risico — intensiteit beperken",    kort:"Hoog risico",     ernst:"rood",  tx:"Verhoog rust, verminder belastingintensiteit en -duur. Koeling verplicht. Intensieve series beperken.",
+        bericht:"Training is aangepast: verhoog de rusttijd, verminder de belastingintensiteit en -duur. Koeling tussen de series is verplicht. Beperk intensieve series tot het minimum." },
+      { max:30.1, k:"#b71c1c", i:"🚨", t:"Zeer hoog risico — rust 1:1",           kort:"Zeer hoog risico",ernst:"rood",  tx:"Rust/arbeid 1:1. Intensieve oefeningen sterk beperken. Sporters met verhoogd risico nauwkeurig observeren.",
+        bericht:"Training is sterk aangepast: rust/arbeid verhouding 1:1. Intensieve oefeningen worden sterk beperkt. Sporters met verhoogd risico worden extra geobserveerd. Informeer jullie groepen." },
+      { max:999,  k:"#880e0e", i:"🛑", t:"Afgelasten — AU protocol",              kort:"Afgelasten",      ernst:"zwart", tx:"Training en wedstrijd afgelasten of stoppen conform Atletiekunie protocol juni 2026.",
+        bericht:"De training is afgelast conform het Atletiekunie protocol bij hoge temperatuur (juni 2026). De WBGT-index overschrijdt de veilige grens. Informeer jullie groepen." },
     ],
     noaa: [
-      { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        ernst:"groen", tx:"Alle baanonderdelen normaal. Reguliere hydratatie.", bericht:"" },
-      { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              kort:"Matig",       ernst:"geel",  tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes.", bericht:"" },
-      { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            kort:"Hoog",        ernst:"rood",  tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten.", bericht:"" },
-      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            kort:"Afgelasten",  ernst:"zwart", tx:"Afgelasten of verplaatsen naar koeler moment.", bericht:"" },
+      { max:23,  k:"#2d8a4e", i:"✅", t:"Goed — normaal trainen",               kort:"Goed",        ernst:"groen", tx:"Alle baanonderdelen normaal. Reguliere hydratatie.",
+        bericht:"Geen bezwaren voor de training. Alle baanonderdelen normaal. Reguliere hydratatie." },
+      { max:30,  k:"#ffd166", i:"ℹ️", t:"Matig — herstel verhogen",              kort:"Matig",       ernst:"geel",  tx:"Langere rust tussen series. Schaduw bij wachten. Springen/werpen: meer rustpauzes.",
+        bericht:"Training gaat door met aanpassingen: langere rust tussen series. Schaduw verplicht bij wachten. Bij springen en werpen meer rustpauzes inbouwen." },
+      { max:35,  k:"#d94f3d", i:"🚨", t:"Hoog — essentieel beperken",            kort:"Hoog",        ernst:"rood",  tx:"Beperkt tot essentiële series. Koeling verplicht. Afbreken bij klachten.",
+        bericht:"Training is aangepast: alleen essentiële series. Koeling verplicht tussen pogingen. Bij klachten direct stoppen. Informeer jullie groepen." },
+      { max:999, k:"#b71c1c", i:"🛑", t:"Afgelasten",                            kort:"Afgelasten",  ernst:"zwart", tx:"Afgelasten of verplaatsen naar koeler moment.",
+        bericht:"De training is afgelast of verplaatst naar een koeler moment. Informeer jullie groepen." },
     ],
   },
 };
@@ -1703,10 +1761,13 @@ function startRefresh() {
 
 window.addEventListener("load", () => {
   startRefresh();
-  // Zet juist icoon op de thema-knop
+  // Thema knop icoon
   const thema = document.documentElement.getAttribute("data-theme") || "dark";
   const btn = document.getElementById("theme-btn");
   if (btn) btn.textContent = thema === "light" ? "🌙" : "☀️";
+  // Discipline instellen via URL of localStorage
+  const disc = window._startDiscipline || "duur";
+  setDiscipline(disc);
 });
 
 // Vernieuw direct als app weer op voorgrond komt (iOS webapp fix)
