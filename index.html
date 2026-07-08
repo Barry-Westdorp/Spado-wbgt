@@ -785,18 +785,9 @@
 
   <!-- Atletiek Advies Tabs -->
   <div class="card scale-full" id="advies-card">
-    <div class="card-header">▸ ATLETIEK ADVIES — gebaseerd op actuele index</div>
+    <div class="card-header">▸ ATLETIEK ADVIES — <span id="advies-discipline-label">Duurlopen &amp; Wegatletiek</span></div>
 
-    <div style="padding: 16px 20px 0;">
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="tab-btn active" onclick="setTab('duur')" id="tab-duur">
-          🏃 Duurlopen &amp; Wegatletiek
-        </button>
-        <button class="tab-btn" onclick="setTab('baan')" id="tab-baan">
-          ⚡ Baan &amp; Technisch
-        </button>
-      </div>
-    </div>
+
 
     <!-- Tab: Duurlopen -->
     <div id="panel-duur" class="tab-panel" style="padding:20px;">
@@ -1099,6 +1090,9 @@ function setDiscipline(disc) {
     updateNiveauBadge(actief, keuze);
   }
   if (window._lastVoorspelling) renderVoorspelling(window._lastVoorspelling);
+  // Update advies card header
+  const discLabel = document.getElementById("advies-discipline-label");
+  if (discLabel) discLabel.textContent = disc === "baan" ? "Baan & Technisch" : "Duurlopen & Wegatletiek";
   // Sla op in localStorage
   localStorage.setItem("spado-discipline", disc);
 }
