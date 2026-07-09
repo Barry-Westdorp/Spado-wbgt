@@ -1729,7 +1729,7 @@ function renderDagVoorspelling(dagen) {
     if (!d.ta_max) return;
 
     // WBGT piek: gebruik dagmaximum temp, gemiddelde RH, max wind en max straling
-    const rh_gem = d.rh_min != null && d.rh_max != null ? Math.round((d.rh_min + d.rh_max) / 2) : 60;
+    const rh_gem = d.rh_gem ?? 60;
     const ff_dag = Math.max(d.ff_max || 2, 0.5);
     const tw_d   = stullTw(d.ta_max, rh_gem);
     const tg_d   = liljegrenTg(d.ta_max, d.q_max || 600, ff_dag);
