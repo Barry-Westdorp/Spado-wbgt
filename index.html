@@ -1635,9 +1635,10 @@ function verwerkData(data) {
   set("v-ta", ta); set("v-rh", rh, 0); set("v-ff", ff);
   set("v-q",  q, 0); set("v-fdir", fdir, 0);
 
-  if (ta == null || rh == null || ff == null || q == null) return;
+  if (ta == null || rh == null || ff == null) return;
+  const q_wbgt = q ?? 0;  // 's nachts geen straling → gebruik 0
 
-  const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q, ff);
+  const { tw, tg, wbgt } = wbgtBuiten(ta, rh, q_wbgt, ff);
   const wbgt_in  = wbgtBinnen(ta, rh);
   const hk       = isNaN(wbgt) ? 0 : calcHK(wbgt);
   const hkLevel  = HK_SCALE[hk];
