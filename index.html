@@ -1486,10 +1486,11 @@ function setIndexKeuze(keuze) {
 
 // ── Tab switcher ──────────────────────────────────────────────────
 function setTab(tab) {
-  document.getElementById("panel-duur").style.display = tab === "duur" ? "block" : "none";
-  document.getElementById("panel-baan").style.display = tab === "baan" ? "block" : "none";
-  document.getElementById("tab-duur").classList.toggle("active", tab === "duur");
-  document.getElementById("tab-baan").classList.toggle("active", tab === "baan");
+  const panelDuur = document.getElementById("panel-duur");
+  const panelBaan = document.getElementById("panel-baan");
+  if (panelDuur) panelDuur.style.display = tab === "duur" ? "block" : "none";
+  if (panelBaan) panelBaan.style.display = tab === "baan" ? "block" : "none";
+  // Tab-knoppen zijn verwijderd — geen classList update nodig
 }
 
 // ── Advies updaten ────────────────────────────────────────────────
