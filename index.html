@@ -1120,6 +1120,12 @@
 
 
 <footer>
+  <div style="border-top:1px solid var(--border);padding:12px 24px 4px;margin-bottom:12px;font-size:0.72rem;color:var(--muted);line-height:1.6;text-align:center;">
+    Deze tool is een hulpmiddel ter ondersteuning van trainers en coördinatoren van SPADO Bergen op Zoom.
+    De berekeningen zijn gebaseerd op wetenschappelijke methoden (ISO 7243, Liljegren 2008, KNMI TR-26-04) en actuele meetdata van KNMI station Woensdrecht.
+    Aan de weergegeven waarden en adviezen kunnen geen rechten worden ontleend.
+    De eindverantwoordelijkheid voor het al dan niet doorgaan van een training of wedstrijd ligt altijd bij de verantwoordelijke trainer of coördinator.
+  </div>
   Bron: <a href="https://dataplatform.knmi.nl" target="_blank">KNMI Dataplatform</a> ·
   Methode: Liljegren (TR-26-04, 2026) · Stull (2011) · ISO 7243:2017 ·
   Station Woensdrecht 06340
@@ -1185,7 +1191,8 @@ function toggleTheme() {
                    : urlParam === "weg"  ? "duur"
                    : opgeslagenDisc      || "duur";
 
-  // Zet discipline zodra DOM geladen is
+  // Schrijf discipline al naar localStorage zodat actieveDiscipline() correct werkt
+  localStorage.setItem("spado-discipline", discipline);
   window._startDiscipline = discipline;
 })();
 
@@ -1406,7 +1413,7 @@ function maakBericht(niveau, indexNaam, waarde, discipline, dagStr) {
 }
 
 function actieveDiscipline() {
-  return document.getElementById("tab-baan")?.classList.contains("active") ? "baan" : "duur";
+  return localStorage.getItem("spado-discipline") || "duur";
 }
 
 function adviesNiveau(waarde, keuze, discipline) {
