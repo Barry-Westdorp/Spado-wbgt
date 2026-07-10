@@ -1159,7 +1159,8 @@ function setDiscipline(disc) {
   // Update advies card header
   const discLabel = document.getElementById("advies-discipline-label");
   if (discLabel) discLabel.textContent = disc === "baan" ? "Baan & Technisch" : "Duurlopen & Wegatletiek";
-  // Sla op in localStorage
+  // Sla op in globale variabele en localStorage
+  window._discipline = disc;
   localStorage.setItem("spado-discipline", disc);
 }
 
@@ -1191,7 +1192,8 @@ function toggleTheme() {
                    : urlParam === "weg"  ? "duur"
                    : opgeslagenDisc      || "duur";
 
-  // Schrijf discipline al naar localStorage zodat actieveDiscipline() correct werkt
+  // Schrijf discipline direct naar globale variabele EN localStorage
+  window._discipline = discipline;
   localStorage.setItem("spado-discipline", discipline);
   window._startDiscipline = discipline;
 })();
@@ -1413,7 +1415,7 @@ function maakBericht(niveau, indexNaam, waarde, discipline, dagStr) {
 }
 
 function actieveDiscipline() {
-  return localStorage.getItem("spado-discipline") || "duur";
+  return window._discipline || localStorage.getItem("spado-discipline") || "duur";
 }
 
 function adviesNiveau(waarde, keuze, discipline) {
