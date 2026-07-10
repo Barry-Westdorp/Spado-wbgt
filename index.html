@@ -1746,6 +1746,7 @@ function renderDagVoorspelling(dagen) {
     const hx_d   = humidexUitTabel(d.ta_max, rh_gem);
     const actief = keuze === "humidex" ? (hx_d.waarde ?? wbgt_d) : wbgt_d;
 
+    console.log(`Dag ${d.datum}: actief=${actief}, keuze=${keuze}, disc=${disc}, niv=${adviesNiveau(actief, keuze, disc).kort}`);
     const niv    = adviesNiveau(actief, keuze, disc);
     const datum  = new Date(d.datum + "T12:00:00");
     const dagNm  = DAGEN_NL[datum.getDay()];
