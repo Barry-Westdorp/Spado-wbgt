@@ -1155,13 +1155,23 @@ function setDiscipline(disc) {
     const actief = keuze === "humidex" ? w.humidex : w.wbgt;
     updateNiveauBadge(actief, keuze);
   }
+  // Sla discipline OP VOORDAT we renderen zodat actieveDiscipline() correct is
+  window._discipline = disc;
+  localStorage.setItem("spado-discipline", disc);
+
   if (window._lastVoorspelling) renderVoorspelling(window._lastVoorspelling);
+  if (window._lastDagVoorspelling) renderDagVoorspelling(window._lastDagVoorspelling);
+  // Update advies banner
+  const w2 = window._laatsteWaarden;
+  if (w2) {
+    const keuze2 = document.getElementById("index-keuze")?.value || "wbgt";
+    const actief2 = keuze2 === "humidex" ? w2.humidex : w2.wbgt;
+    updateAdvies(actief2);
+    updateNiveauBadge(actief2, keuze2);
+  }
   // Update advies card header
   const discLabel = document.getElementById("advies-discipline-label");
   if (discLabel) discLabel.textContent = disc === "baan" ? "Baan & Technisch" : "Duurlopen & Wegatletiek";
-  // Sla op in globale variabele en localStorage
-  window._discipline = disc;
-  localStorage.setItem("spado-discipline", disc);
 }
 
 // ── Thema ────────────────────────────────────────────────────────
