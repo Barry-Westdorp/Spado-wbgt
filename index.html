@@ -716,8 +716,8 @@
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Discipline</div>
             <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;">
-              <button id="btn-weg" onclick="setDiscipline('duur')" style="padding:7px 16px;border:none;background:var(--accent);color:white;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Weg</button>
-              <button id="btn-baan" onclick="setDiscipline('baan')" style="padding:7px 16px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Baan</button>
+              <button type="button" id="btn-weg" onclick="setDiscipline('duur')" style="padding:7px 16px;border:none;background:var(--accent);color:white;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Weg</button>
+              <button type="button" id="btn-baan" onclick="setDiscipline('baan')" style="padding:7px 16px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:0.82rem;cursor:pointer;font-family:var(--font-body);">Baan</button>
             </div>
           </div>
 
@@ -1756,7 +1756,6 @@ function renderDagVoorspelling(dagen) {
     const hx_d   = humidexUitTabel(d.ta_max, rh_gem);
     const actief = keuze === "humidex" ? (hx_d.waarde ?? wbgt_d) : wbgt_d;
 
-    console.log(`Dag ${d.datum}: actief=${actief}, keuze=${keuze}, disc=${disc}, niv=${adviesNiveau(actief, keuze, disc).kort}`);
     const niv    = adviesNiveau(actief, keuze, disc);
     const datum  = new Date(d.datum + "T12:00:00");
     const dagNm  = DAGEN_NL[datum.getDay()];
